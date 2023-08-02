@@ -1,0 +1,1 @@
+import{o as e,c as t,b as s}from"./app-2cac3384.js";const n={class:"flex items-center justify-center"},o=s("div",{class:"spinner-border border- animate-spin inline-block w-6 h-6 border-4 rounded-full",role:"status"},null,-1),r=[o],_={name:"Spinner"},d=Object.assign(_,{props:{colorClass:{type:String,default:"text-white"}},setup(c){return(a,i)=>(e(),t("div",n,r))}});export{d as _};

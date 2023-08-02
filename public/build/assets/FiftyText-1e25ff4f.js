@@ -1,0 +1,1 @@
+import{o as a,c as s,s as o,n as r}from"./app-2cac3384.js";const n={name:"FiftyText"},i=Object.assign(n,{props:{variation:{type:String,default:""},color:{type:String,default:"grey"}},setup(t){return(e,c)=>(a(),s("div",{class:r([`${t.variation} ${t.color}`,"basic-text"])},[o(e.$slots,"default")],2))}});export{i as _};
