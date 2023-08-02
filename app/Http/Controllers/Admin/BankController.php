@@ -10,13 +10,27 @@ use App\Models\Bank;
 use App\Models\Country;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+
 
 class BankController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $sort =  $request->get('column')?$request->get('column') : 'id';
+        $sortType =$request->get('type')?$request->get('type') : 'asc';
+        if ($sort != 'country') {
+
+            $query = Bank::orderBy($sort, $sortType);
+        } else {
+            $query = Bank::join('countries', 'banks.country_id', '=', 'countries.id')
+                ->orderBy('countries.label', $sortType)
+                ->select('banks.*');
+        }
+
+        $banks = $query->paginate(25);
         return Inertia::render('Admin/Banks/Index', [
-            'banks' => Bank::whereNotNull('country_id')->paginate(50),
+            'banks' => $banks,
             'countries' => Country::supportedCountries(),
         ]);
     }

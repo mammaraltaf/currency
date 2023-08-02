@@ -35,7 +35,6 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     Route::put('/admin/currencies/update/{currency}', [CurrencyController::class, 'update'])->name('currencies.update');
     Route::delete('/admin/currencies/delete/{currency}', [CurrencyController::class, 'delete'])->name('currencies.delete');
     Route::put('/admin/currencies/update-rates', [CurrencyController::class, 'updateRates'])->name('currencies.update.rates');
-    Route::get('/admin/currencies/{column}/{type}', [CurrencyController::class, 'currenciesPageSort'])->name('currencies.page.sort');
 
     // countries
     Route::get('/admin/countries', [CountriesController::class, 'countriesPage'])->name('countries.page');

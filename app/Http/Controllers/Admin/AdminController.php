@@ -18,12 +18,16 @@ class AdminController extends Controller
     }
 
 
-    public function adminsPage(): Response
+    public function adminsPage(Request $request): Response
     {
+        $columnName = $request->get('column')?$request->get('column'):'created_at';
+        $columnType = $request->get('type')?$request->get('type'):'desc';
+            $query =User::whereHas('roles')
+                ->orderBy($columnName, $columnType);
+        $admins = $query->paginate(25);
         return Inertia::render('Admin/Admins', [
-            'admins' => User::whereHas('roles')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10)
+            'admins' =>$admins,
+
         ]);
     }
 

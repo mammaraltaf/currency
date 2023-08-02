@@ -1,15 +1,16 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import Pagination from "@/Components/Custom/Pagination.vue";
-import {Head} from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import CreateBank from "@/Pages/Admin/Banks/partials/CreateBank.vue";
 import DeleteIcon from "@/Icons/DeleteIcon.vue";
 import EditIcon from "@/Icons/EditIcon.vue";
-import {useAPI} from "@/Composables/useAPI";
-import {useNotificationStore} from "@/stores/notification";
+import { useAPI } from "@/Composables/useAPI";
+import { useNotificationStore } from "@/stores/notification";
 import Spinner from "@/Components/Custom/Spinner.vue";
-import {reactive, ref} from "vue";
+import { reactive, ref } from "vue";
 import EditBank from "@/Pages/Admin/Banks/partials/EditBank.vue";
+import { router } from '@inertiajs/vue3'
 
 
 const api = useAPI();
@@ -71,11 +72,22 @@ const deleteBank = async (bank) => {
 
 
 
-
+// sorting
+// let sortFlag = ref(1)
+let sortColumn = ref('code')
+let sortType = ref('asc')
+let sortValues = (column) => {
+    sortColumn.value = column;
+    if (sortColumn.value === column) {
+        sortType.value = sortType.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortType.value = 'asc';
+    }
+    router.visit(`?column=${sortColumn.value}&type=${sortType.value}`);
+}
 </script>
 
 <template>
-
     <Head title="Banks">
         <title>
             Admin Panel | Banks
@@ -97,72 +109,58 @@ const deleteBank = async (bank) => {
             </div>
 
 
-            <CreateBank
-                @bankAdded="bankAdded"
-                :countries="countries"
-            />
+            <CreateBank @bankAdded="bankAdded" :countries="countries" />
 
-            <EditBank
-                v-if="editedBank.value?.id"
-                @endEdit="endEdit"
-                @bankEdited="bankEdited"
-                :edited-bank="editedBank"
-                :countries="countries"
-            />
+            <EditBank v-if="editedBank.value?.id" @endEdit="endEdit" @bankEdited="bankEdited" :edited-bank="editedBank"
+                :countries="countries" />
 
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th class="px-6 py-3" scope="col">
-                            #ID
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Bank Name
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Country
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Actions
-                        </th>
-                    </tr>
+                        <tr>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('id')">
+                                #ID
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('label')">
+                                Bank Name
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('country')">
+                                Country
+                            </th>
+                            <th class="px-6 py-3" scope="col">
+                                Actions
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="bank in props.banks.data"
-                        :key="bank.id"
-                        v-show="bank.id !== 'deleted'"
-                        class="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
-                    >
+                        <tr v-for="bank in props.banks.data" :key="bank.id" v-show="bank.id !== 'deleted'"
+                            class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
 
-                        <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                            {{ bank.id }}
-                        </th>
-                        <td class="px-6 py-4">
-                            {{ bank.label }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ bank.country.label }} ({{ bank.country.code }})
-                        </td>
-                        <td class="px-6 py-4 flex gap-4 items-center">
-                            <DeleteIcon
-                                @click="deleteBank(bank)"
-                                class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1"
-                            />
+                            <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
+                                {{ bank.id }}
+                            </th>
+                            <td class="px-6 py-4">
+                                {{ bank.label }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ bank.country ? bank.country.label : 'N/A' }} ({{ bank.country ? bank.country.code : 'N/A' }})
+                            </td>
+                            <td class="px-6 py-4 flex gap-4 items-center">
+                                <DeleteIcon @click="deleteBank(bank)"
+                                    class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1" />
 
-                            <EditIcon
-                                @click="edit(bank)"
-                                class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1"
-                            />
+                                <EditIcon @click="edit(bank)"
+                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
 
-                            <Spinner v-if="api.isLoading.value && deletingBankId === bank.id" class="button-spinner-center action-btn"/>
-                        </td>
-                    </tr>
+                                <Spinner v-if="api.isLoading.value && deletingBankId === bank.id"
+                                    class="button-spinner-center action-btn" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <Pagination :links="props.banks.links"/>
+            <Pagination :links="props.banks.links" />
         </div>
 
     </AdminLayout>
@@ -174,3 +172,8 @@ export default {
     name: 'Banks'
 }
 </script>
+<style scoped>
+th:not(:last-child) {
+    cursor: pointer;
+}
+</style>

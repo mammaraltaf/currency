@@ -12,22 +12,24 @@ use App\Models\Setting;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
 
 class CurrencyController extends Controller
 {
-    public function currenciesPage(): Response
+    public function currenciesPage(Request $request):Response
     {
+        $columnName = $request->get('column')?$request->get('column'):'code';
+        $columnType = $request->get('type')?$request->get('type'):'asc';
         $fetched_at = Setting::first() ? Setting::first()->main['fetched_at'] : null;
-
-        $query = Currency::with(['country:label,id,currency_id'])->orderBy('code');
-
-        if (request()->has('q') && !empty(request('q'))) {
+        // dd($columnName,$columnType);
+        $query = Currency::with(['country:label,id,currency_id'])->orderBy($columnName,$columnType);
+        if (request()->has('q') ) {
             $query->where('code','LIKE', '%' . request('q') . '%');
         }
-
         $currencies = $query->paginate(25);
 
-        return Inertia::render('Admin/Currencies/Index', [
+        // dd($currencies);
+            return Inertia::render('Admin/Currencies/Index', [
             'currencies' => $currencies,
             'info' => [
                 'fetched_at' => $fetched_at ? Carbon::parse($fetched_at)->diffForHumans() : ''

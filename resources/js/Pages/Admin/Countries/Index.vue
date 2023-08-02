@@ -1,14 +1,15 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import Pagination from "@/Components/Custom/Pagination.vue";
-import {Head} from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import CreateCountry from "@/Pages/Admin/Countries/partials/CreateCountry.vue";
 import EditCountry from "@/Pages/Admin/Countries/partials/EditCountry.vue";
-import {reactive, ref} from "vue";
-import {useAPI} from "@/Composables/useAPI";
-import {useNotificationStore} from "@/stores/notification";
+import { reactive, ref } from "vue";
+import { useAPI } from "@/Composables/useAPI";
+import { useNotificationStore } from "@/stores/notification";
 import EditIcon from "@/Icons/EditIcon.vue";
 import Spinner from "@/Components/Custom/Spinner.vue";
+import { router } from '@inertiajs/vue3'
 
 const api = useAPI();
 const notification = useNotificationStore();
@@ -46,6 +47,23 @@ const countryEdited = (country) => {
     props.countries.data.splice(index, 1, country);
 }
 
+/// sorting
+let sortColumn = ref('id')
+let sortType = ref('asc')
+let sortValues = (column) => {
+    sortColumn.value = column;
+
+    if (sortColumn.value == column) {
+
+        sortType.value = sortType.value =='asc' ? 'desc' : 'asc';
+        console.log('sortType.value', sortType.value, 'sortColumn.value', sortColumn.value);
+
+    } else {
+
+        sortType.value = 'asc';
+    }
+    router.visit(`?column=${sortColumn.value}&type=${sortType.value}`);
+}
 </script>
 
 <template>
@@ -69,73 +87,66 @@ const countryEdited = (country) => {
                 </div>
             </div>
 
-            <CreateCountry :currencies="currencies"/>
+            <CreateCountry :currencies="currencies" />
 
-            <EditCountry
-                v-if="editedCountry.value?.id"
-                @endEdit="endEdit"
-                @countryEdited="countryEdited"
-                :edited-country="editedCountry"
-                :currencies="currencies"
-            />
+            <EditCountry v-if="editedCountry.value?.id" @endEdit="endEdit" @countryEdited="countryEdited"
+                :edited-country="editedCountry" :currencies="currencies" />
 
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th class="px-6 py-3" scope="col">
-                            #ID
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Country Name
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Currency
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Sending Countries
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Receiving Countries
-                        </th>
-                        <th class="px-6 py-3" scope="col">
-                            Actions
-                        </th>
-                    </tr>
+                        <tr>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('id')">
+                                #ID
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('label')">
+                                Country Name
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('name')">
+                                Currency
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('can_send')">
+                                Sending Countries
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sortValues('can_receive')">
+                                Receiving Countries
+                            </th>
+                            <th class="px-6 py-3" scope="col">
+                                Actions
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="country in props.countries.data" :key="country.id"
-                        v-show="country.id !== 'deleted'"
-                        class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                        <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                            {{ country.id }}
-                        </th>
-                        <td class="px-6 py-4">
-                            {{ country.label }} ({{ country.code }})
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ country.currency.name }} ({{ country.currency.code }})
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ country.can_send }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ country.can_receive }}
-                        </td>
-                        <td class="px-6 py-4 flex gap-4 items-center">
-                            <EditIcon
-                                @click="edit(country)"
-                                class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1"
-                            />
+                        <tr v-for="country in props.countries.data" :key="country.id" v-show="country.id !== 'deleted'"
+                            class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                            <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
+                                {{ country.id }}
+                            </th>
+                            <td class="px-6 py-4">
+                                {{ country.label }} ({{ country.code }})
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ country.currency.name }} ({{ country.currency.code }})
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ country.can_send }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ country.can_receive }}
+                            </td>
+                            <td class="px-6 py-4 flex gap-4 items-center">
+                                <EditIcon @click="edit(country)"
+                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
 
-                            <Spinner v-if="api.isLoading.value && deletingCountryId === country.id" class="button-spinner-center action-btn"/>
-                        </td>
-                    </tr>
+                                <Spinner v-if="api.isLoading.value && deletingCountryId === country.id"
+                                    class="button-spinner-center action-btn" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <Pagination :links="props.countries.links"/>
+            <Pagination :links="props.countries.links" />
         </div>
 
     </AdminLayout>
@@ -147,3 +158,8 @@ export default {
     name: 'Countries'
 }
 </script>
+<style scoped>
+th:not(:last-child) {
+    cursor: pointer;
+}
+</style>
