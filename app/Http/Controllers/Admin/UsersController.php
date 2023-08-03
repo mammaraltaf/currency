@@ -12,10 +12,12 @@ class UsersController extends Controller
 {
 
 
-    public function usersPage(): Response
+    public function usersPage(Request $request): Response
     {
-        $query = User::whereDoesntHave('roles')->orderBy('created_at', 'desc');
-
+        $columnName = $request->get('column') ? $request->get('column') : 'created_at';
+        $columnType = $request->get('type') ? $request->get('type') : 'desc';
+        $query = User::whereDoesntHave('roles')
+            ->orderBy($columnName, $columnType);
         if (request()->has('q') && !empty(request('q')))  {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
@@ -26,6 +28,7 @@ class UsersController extends Controller
                     ->orWhere('country', 'like', '%' . $search . '%');
             });
         }
+
         $users = $query->paginate(10);
 
         return Inertia::render('Admin/Users/Index', [

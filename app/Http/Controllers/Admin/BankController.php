@@ -10,20 +10,30 @@ use App\Models\Bank;
 use App\Models\Country;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
 
 class BankController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $query = Bank::whereNotNull('country_id');
-
+        $sort = $request->get('column') ? $request->get('column') : 'id';
+        $sortType = $request->get('type') ? $request->get('type') : 'asc';
+        if ($sort != 'country') {
+            $query = $query->orderBy($sort, $sortType);
+        } else {
+            $query = $query->join('countries', 'banks.country_id', '=', 'countries.id')
+                ->orderBy('countries.label', $sortType)
+                ->select('banks.*');
+        }
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
-                $innerQuery->whereHas('country', function ($countryQuery) use ($search) {
-                    $countryQuery->where('label', 'like', '%' . $search . '%');
-                })
-                ->orWhere('label', 'like', '%' . $search . '%');
+                $innerQuery
+                    ->whereHas('country', function ($countryQuery) use ($search) {
+                        $countryQuery->where('label', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('label', 'like', '%' . $search . '%');
             });
         }
 
@@ -45,7 +55,7 @@ class BankController extends Controller
         return $bank->update($request->validated());
     }
 
-    public function delete(DeleteBankRequest $request, Bank $bank): array | bool
+    public function delete(DeleteBankRequest $request, Bank $bank): array|bool
     {
         if ($bank->delete()) {
             return ['id' => $bank->id];
@@ -53,5 +63,4 @@ class BankController extends Controller
 
         return false;
     }
-
 }

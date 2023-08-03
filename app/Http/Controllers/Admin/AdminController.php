@@ -17,15 +17,16 @@ class AdminController extends Controller
         return Inertia::render('Admin/AdminPanel');
     }
 
-
-    public function adminsPage(): Response
+    public function adminsPage(Request $request): Response
     {
-
-        $query = User::whereHas('roles')->orderBy('created_at', 'desc');
-        if (request()->has('q') && !empty(request('q')))  {
+        $columnName = $request->get('column') ? $request->get('column') : 'created_at';
+        $columnType = $request->get('type') ? $request->get('type') : 'desc';
+        $query = User::whereHas('roles')->orderBy($columnName, $columnType);
+        if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
-                $innerQuery->where('first_name', 'like', '%' . $search . '%')
+                $innerQuery
+                    ->where('first_name', 'like', '%' . $search . '%')
                     ->orWhere('last_name', 'like', '%' . $search . '%')
                     ->orWhere('phone', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%')
@@ -35,8 +36,7 @@ class AdminController extends Controller
         $admins = $query->paginate(10);
 
         return Inertia::render('Admin/Admins', [
-            'admins' =>  $admins
+            'admins' => $admins,
         ]);
     }
-
 }

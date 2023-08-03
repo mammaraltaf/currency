@@ -11,10 +11,17 @@ use Inertia\Response;
 class ReceiverController extends Controller
 {
 
-    public function receiversPage(): Response
+    public function receiversPage(Request $request): Response
     {
-        $query = Receiver::orderBy('created_at', 'desc');
-
+        $columnName = $request->get('column')?$request->get('column'):'created_at';
+        $columnType = $request->get('type')?$request->get('type'):'desc';
+        if ($columnName != 'label') {
+            $query = Receiver::orderBy($columnName,$columnType);
+        } else {
+            $query = Receiver::join('banks', 'receivers.bank_id', '=', 'banks.id')
+                ->orderBy('banks.label', $columnType)
+                ->select('receivers.*');
+        }
         if (request()->has('q') && !empty(request('q')))  {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
@@ -25,7 +32,8 @@ class ReceiverController extends Controller
                     ->orWhere('country', 'like', '%' . $search . '%');
             });
         }
-        $receivers = $query->paginate(10);
+
+        $receivers = $query->paginate(5);
 
         return Inertia::render('Admin/Receivers/Index', [
             'receivers' =>$receivers

@@ -12,9 +12,14 @@ use Inertia\Response;
 class TransactionController extends Controller
 {
 
-    public function transactionsPage(): Response
+    public function transactionsPage(Request $request): Response
     {
-        $query = Transaction::with('user')->orderBy('created_at', 'desc');
+        $sort = $request->get('column') ? $request->get('column') : 'id';
+        $sortType = $request->get('type') ? $request->get('type') : 'asc';
+        $query = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('receivers', 'transactions.receiver_id', '=', 'receivers.id')
+            ->join('payment_intents', 'transactions.payment_intent_id', '=', 'payment_intents.id')
+            ->select('users.*', 'receivers.*', 'transactions.*');
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
@@ -28,6 +33,16 @@ class TransactionController extends Controller
             });
         }
 
+
+        if ($sort == 'user') {
+            $query = $query->orderBy('users.first_name', $sortType);
+        } elseif ($sort == 'receiver') {
+            $query = $query->orderBy('receivers.first_name', $sortType);
+        } elseif ($sort == 'amount') {
+            $query = $query->orderBy('payment_intents.amount', $sortType);
+        }  else {
+            $query = Transaction::with('user')->orderBy($sort, $sortType);
+        }
         $transactions = $query->paginate(10);
         return Inertia::render('Admin/Transactions/Index', [
             'transactions' => $transactions,

@@ -8,12 +8,21 @@ use Inertia\Inertia;
 use App\Http\Requests\Admin\Post\StorePostRequest;
 use App\Http\Requests\Admin\Post\DeletePostRequest;
 use Inertia\Response;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function postsPage(): Response
+    public function postsPage(Request $request): Response
     {
-        $query = Post::with('transaction.user')->orderBy('created_at', 'desc');
+        $sort = $request->get('column') ? $request->get('column') : 'created_at';
+        $sortType = $request->get('type') ? $request->get('type') : 'desc';
+
+        $query = Post::join('transactions', 'posts.transaction_id', '=', 'transactions.id')
+            ->join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('receivers', 'transactions.receiver_id', '=', 'receivers.id')
+            ->join('payment_intents', 'transactions.payment_intent_id', '=', 'payment_intents.id')
+            ->select('posts.*', 'users.*', 'receivers.*', 'payment_intents.*', 'transactions.*');
+
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
@@ -22,6 +31,18 @@ class PostController extends Controller
                 })
                     ->orWhere('status', 'like', '%' . $search . '%');
             });
+        }
+
+        if ($sort == 'user') {
+            $query = $sortQuery->orderBy('users.first_name', $sortType);
+        } elseif ($sort == 'receiver') {
+            $query = $sortQuery->orderBy('receivers.first_name', $sortType);
+        } elseif ($sort == 'amount') {
+            $query = $sortQuery->orderBy('payment_intents.amount', $sortType);
+        } elseif ($sort == 'id') {
+            $query = $sortQuery->orderBy('transactions.id', $sortType);
+        } else {
+            $query = Post::orderBy($sort, $sortType);
         }
 
         $posts = $query->paginate(10);
