@@ -11,6 +11,7 @@ import Spinner from "@/Components/Custom/Spinner.vue";
 import { reactive, ref } from "vue";
 import EditBank from "@/Pages/Admin/Banks/partials/EditBank.vue";
 import { router } from '@inertiajs/vue3'
+import {useSortingStore} from "@/stores/sorting";
 
 
 const api = useAPI();
@@ -71,20 +72,12 @@ const deleteBank = async (bank) => {
 }
 
 
-
 // sorting
-// let sortFlag = ref(1)
-let sortColumn = ref('code')
-let sortType = ref('asc')
-let sortValues = (column) => {
-    sortColumn.value = column;
-    if (sortColumn.value === column) {
-        sortType.value = sortType.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortType.value = 'asc';
-    }
-    router.visit(`?column=${sortColumn.value}&type=${sortType.value}`);
-}
+const store = useSortingStore();
+const sort = (column) => {
+  store.sortValues(column);
+  router.visit(`?column=${store.column}&type=${store.type}`);
+};
 </script>
 
 <template>
@@ -118,13 +111,13 @@ let sortValues = (column) => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('id')">
+                            <th class="px-6 py-3" scope="col" @click="sort('id')">
                                 #ID
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('label')">
+                            <th class="px-6 py-3" scope="col" @click="sort('label')">
                                 Bank Name
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('country')">
+                            <th class="px-6 py-3" scope="col" @click="sort('country')">
                                 Country
                             </th>
                             <th class="px-6 py-3" scope="col">

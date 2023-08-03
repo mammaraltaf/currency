@@ -39,7 +39,6 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // countries
     Route::get('/admin/countries', [CountriesController::class, 'countriesPage'])->name('countries.page');
     Route::post('/admin/countries/store', [CountriesController::class, 'store'])->name('countries.store');
-    Route::put('/admin/countries/update/{country}', [CountriesController::class, 'update'])->name('countries.update');
 
 
     // users

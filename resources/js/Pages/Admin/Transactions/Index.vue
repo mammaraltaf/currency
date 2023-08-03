@@ -2,6 +2,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import Pagination from "@/Components/Custom/Pagination.vue";
 import {Head, Link} from "@inertiajs/vue3";
+import {useSortingStore} from "@/stores/sorting";
 
 const props = defineProps({
     transactions: {
@@ -9,6 +10,13 @@ const props = defineProps({
         type: Object
     }
 })
+
+// sorting
+const store = useSortingStore();
+const sort = (column) => {
+  store.sortValues(column);
+  router.visit(`?column=${store.column}&type=${store.type}`);
+};
 
 </script>
 
@@ -38,26 +46,26 @@ const props = defineProps({
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('created_at')">
                             Initialized
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('user')">
                             Sender
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('receiver')">
                             Receiver
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('amount')">
                             Amount
                         </th>
 
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('status')">
                             status
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('type')">
                             type
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('payment_status')">
                             Payment Status
                         </th>
                     </tr>
@@ -119,3 +127,9 @@ export default {
     name: 'Transactions/Index'
 }
 </script>
+
+<style scoped>
+th:not(:last-child) {
+    cursor: pointer;
+}
+</style>

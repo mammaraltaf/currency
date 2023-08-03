@@ -10,6 +10,7 @@ import { useNotificationStore } from "@/stores/notification";
 import EditIcon from "@/Icons/EditIcon.vue";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import { router } from '@inertiajs/vue3'
+import {useSortingStore} from "@/stores/sorting";
 
 const api = useAPI();
 const notification = useNotificationStore();
@@ -47,23 +48,12 @@ const countryEdited = (country) => {
     props.countries.data.splice(index, 1, country);
 }
 
-/// sorting
-let sortColumn = ref('id')
-let sortType = ref('asc')
-let sortValues = (column) => {
-    sortColumn.value = column;
-
-    if (sortColumn.value == column) {
-
-        sortType.value = sortType.value =='asc' ? 'desc' : 'asc';
-        console.log('sortType.value', sortType.value, 'sortColumn.value', sortColumn.value);
-
-    } else {
-
-        sortType.value = 'asc';
-    }
-    router.visit(`?column=${sortColumn.value}&type=${sortType.value}`);
-}
+// sorting
+const store = useSortingStore();
+const sort = (column) => {
+  store.sortValues(column);
+  router.visit(`?column=${store.column}&type=${store.type}`);
+};
 </script>
 
 <template>
@@ -96,19 +86,19 @@ let sortValues = (column) => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('id')">
+                            <th class="px-6 py-3" scope="col" @click="sort('id')">
                                 #ID
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('label')">
+                            <th class="px-6 py-3" scope="col" @click="sort('label')">
                                 Country Name
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('name')">
+                            <th class="px-6 py-3" scope="col" @click="sort('name')">
                                 Currency
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('can_send')">
+                            <th class="px-6 py-3" scope="col" @click="sort('can_send')">
                                 Sending Countries
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sortValues('can_receive')">
+                            <th class="px-6 py-3" scope="col" @click="sort('can_receive')">
                                 Receiving Countries
                             </th>
                             <th class="px-6 py-3" scope="col">
