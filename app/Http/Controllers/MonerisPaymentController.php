@@ -59,8 +59,10 @@ class MonerisPaymentController extends Controller
         $validatedData = $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'card_number' => 'required|string|numeric|digits_between:12,19',
-            'expiry_month' => 'required|string|digits:2|numeric|min:1|max:12',
-            'expiry_year' => 'required|string|digits:2|numeric',
+            // 'expiry_month' => 'required|string|digits:2|numeric|min:1|max:12',
+            'expiry_month' => 'required|string|numeric|min:1|max:12',
+            // 'expiry_year' => 'required|string|digits:2|numeric',
+            'expiry_year' => 'required|string|digits:4|numeric',
             'cvv' => 'required|string|numeric|digits_between:3,4',
         ]);
 
@@ -86,8 +88,9 @@ class MonerisPaymentController extends Controller
             ];
 
             /*Send the purchase request*/
-            $response = $gateway->purchase($parameters)->send();
+            // dd($parameters);
 
+            $response = $gateway->purchase($parameters)->send();
             /*Check the response - success or fail*/
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
