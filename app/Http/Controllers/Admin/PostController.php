@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Country;
 use Inertia\Inertia;
-use App\Http\Requests\Admin\Post\StorePostRequest;
-use App\Http\Requests\Admin\Post\DeletePostRequest;
+use App\Http\Requests\Admin\Posts\StorePostRequest;
+use App\Http\Requests\Admin\Posts\DeletePostRequest;
 use Inertia\Response;
 use Illuminate\Http\Request;
 
@@ -46,13 +47,16 @@ class PostController extends Controller
         }
 
         $posts = $query->paginate(10);
+        $countries = Country::select('code','id','label')->get();
         return Inertia::render('Admin/Posts/Index', [
             'posts' => $posts,
+            'countries' => $countries,
         ]);
     }
 
     public function store(StorePostRequest $request)
     {
+        dd($request->all());
         return Post::create($request->validated());
     }
 

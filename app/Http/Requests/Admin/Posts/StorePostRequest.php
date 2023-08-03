@@ -23,6 +23,7 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
+        dd(' i mhere');
         return [
             'transaction_id' => ['required', 'numeric'],
             'country_code' => ['required', 'min:3', 'max:199', 'string'],

@@ -14,6 +14,7 @@ import { useAPI } from "@/Composables/useAPI";
 import { useNotificationStore } from "@/stores/notification";
 import SaveIcon from "@/Icons/SaveIcon.vue";
 import TextInput from "@/Components/TextInput.vue";
+import ToggleSwitch from "@/Components/Custom/ToggleSwitch.vue";
 import { router } from '@inertiajs/vue3'
 
 const api = useAPI();
@@ -51,7 +52,7 @@ function closeEditDialog($isFetchData) {
     showEditDialog.value = false;
     return { showEditDialog };
 }
-// let currency.toggleStatus=
+// let toggleStatus= ref(false)
 const updateRate = (currency) => {
     console.log('currency', currency);
     if (currency.toggleStatus) {
@@ -254,6 +255,9 @@ function setStatus(currency) {
                                 <span>{{ currency.name }}</span>
                             </td>
                             <td class="px-6 py-4">
+                                <!-- <ToggleSwitch  :class="currency.toggleStatus == 'special' ? 'slider-checked' : ''"
+                                :id="'toggle_' + currency.id" v-model="currency.toggleStatus"
+                                    @click="updateRate(currency)" /> -->
                                 <input type="checkbox" :class="currency.rate_source == 'special' ? 'slider-checked' : ''"
                                     class="slider" :id="'toggle_' + currency.id" v-model="currency.toggleStatus"
                                     @change="updateRate(currency)" />

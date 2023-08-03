@@ -1,25 +1,129 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
+import Add from "@/Pages/Admin/Posts/partials/Add.vue";
+import Edit from "@/Pages/Admin/Posts/partials/Edit.vue";
+
 import Pagination from "@/Components/Custom/Pagination.vue";
-import {Head, Link} from "@inertiajs/vue3";
-import {useSortingStore} from "@/stores/sorting";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { useSortingStore } from "@/stores/sorting";
+import Spinner from "@/Components/Custom/Spinner.vue";
+import DeleteIcon from "@/Icons/DeleteIcon.vue";
+import EditIcon from "@/Icons/EditIcon.vue";
+import { ref, reactive, onMounted } from "vue";
+import { useAPI } from "@/Composables/useAPI";
+import { useNotificationStore } from "@/stores/notification";
+import SaveIcon from "@/Icons/SaveIcon.vue";
+import TextInput from "@/Components/TextInput.vue";
+
 
 const props = defineProps({
     posts: {
         required: true,
         type: Object
+    },
+    countries: {
+        required: true,
+        type: Object
     }
-})
 
+})
+// Adding
+const postAdded = () => {
+    props.posts.total++;
+}
+
+// Editing:
+const editingPost = reactive({});
+var showEditDialog = ref(false);
+
+var index = ref()
+const edit = (post) => {
+    editingPost.value = { ...post };
+    index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === editingPost.value.id);
+    console.log(' index.value', index.value);
+
+    showEditDialog.value = true;
+    Edit;
+    return { showEditDialog };
+}
+function closeEditDialog($isFetchData) {
+    console.log('$isFetchData', $isFetchData);
+    // if ($isFetchData) {
+    //     props.posts.data.splice(index.value, 1, currencyData.value);
+
+    // }
+    showEditDialog.value = false;
+    return { showEditDialog };
+}
+// Deleting
+const deletePost = async (post) => {
+    deletingPostId.value = post.id;
+
+    api.startRequest();
+
+    try {
+        const res = await axios.delete('/admin/posts/delete/' + post.id)
+
+        if (res.data.id || res.data.status === 'success') {
+            notification.notify('Post deleted', 'success');
+            post.id = 'deleted';
+            props.posts.total--;
+        }
+    } catch (errors) {
+        notification.notify('Error, this base post can not be deleted.', 'error');
+        api.handleErrors(errors)
+    } finally {
+        api.requestCompleted();
+    }
+}
+
+const fetchingposts = ref(false);
+
+// Updating rates:
+const updatePostRates = async () => {
+    api.startRequest();
+    fetchingposts.value = true;
+
+    try {
+        const res = await axios.put('/admin/posts/update-rates')
+
+        if (res.data.status === 'success') {
+            notification.notify('Post rates updated', 'success');
+            props.posts.data = res.data.posts;
+            props.info.fetched_at = res.data.fetched_at;
+        }
+    } catch (errors) {
+        notification.notify('Error, could not fetch world bank rates.', 'error');
+        api.handleErrors(errors)
+    } finally {
+        fetchingposts.value = false;
+        api.requestCompleted();
+    }
+}
 // sorting
 const store = useSortingStore();
 const sort = (column) => {
-  store.sortValues(column);
-  router.visit(`?column=${store.column}&type=${store.type}`);
+    store.sortValues(column);
+    router.visit(`?column=${store.column}&type=${store.type}`);
 };
+// Search
+let searchValue = ref('');
+const search = () => {
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+}
+const clearSearch = () => {
+    router.visit(`?q=`);
+}
+
+onMounted(() => {
+    searchValue.value = new URLSearchParams(window.location.search).get('q');
+});
 </script>
 
 <template>
+    <Edit :show="showEditDialog" :postData="editingPost" v-if="showEditDialog"
+        v-on:close="closeEditDialog($event)" />
+
     <Head title="Posts">
         <title>
             Posts
@@ -40,92 +144,104 @@ const sort = (column) => {
                 </div>
             </div>
 
+            <Add :countries="props.countries" @postAdded="postAdded" />
+            <div class="flex items-end gap-3 ">
+                <TextInput v-model="searchValue" class="mb-8" label="Search by post code" placeholder="USD"
+                    title="searchValue" v-on:keyup.enter="search" />
 
+                <button @click="search" type="button"
+                    class="mb-8 flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Search
+                </button>
+
+                <button v-if="searchValue" @click="clearSearch" type="button"
+                    class="mb-8 flex items-center text-blue-700 bg-white border border-blue-700 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Clear
+                </button>
+            </div>
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('created_at')">
-                            Initialized
-                        </th>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('status')">
-                            Status
-                        </th>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('user')">
-                            Country from
-                        </th>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('receiver')">
-                            Country To
-                        </th>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('amount')">
-                            Amount
-                        </th>
-                        <th class="px-6 py-3" scope="col"  @click="sortValues('id')">
-                            Direct Transaction Reference
-                        </th>
-                        <th class="px-6 py-3" scope="col" >
-                            Actions
-                        </th>
-                    </tr>
+                        <tr>
+                            <th class="px-6 py-3" scope="col" @click="sort('created_at')">
+                                Initialized
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sort('status')">
+                                Status
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sort('user')">
+                                Country from
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sort('receiver')">
+                                Country To
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sort('amount')">
+                                Amount
+                            </th>
+                            <th class="px-6 py-3" scope="col" @click="sort('id')">
+                                Direct Transaction Reference
+                            </th>
+                            <th class="px-6 py-3" scope="col">
+                                Actions
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="post in props.posts.data" :key="post.id"
-                        class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                        <td class="px-6 py-4">
-                            {{ post.created_at }}
-                        </td>
-                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                            {{ post.status }}
-                        </td>
-                        <td class="px-6 py-3" scope="col">
-                            <p>
-                                {{ post.transaction.user.country }}
-                            </p>
-                            <p>
-                                <Link :href="route('single.user.page', post.transaction.user.id)"
-                                      class="text-blue-700 hover:text-blue-900 hover:underline"
-                                >
+                        <tr v-for="post in props.posts.data" :key="post.id"
+                            class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                            <td class="px-6 py-4">
+                                {{ post.created_at }}
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
+                                {{ post.status }}
+                            </td>
+                            <td class="px-6 py-3" scope="col">
+                                <p>
+                                    {{ post.transaction.user.country }}
+                                </p>
+                                <p>
+                                    <Link :href="route('single.user.page', post.transaction.user.id)"
+                                        class="text-blue-700 hover:text-blue-900 hover:underline">
                                     (View sender)
-                                </Link>
-                            </p>
-                        </td>
-                        <td class="px-6 py-3" scope="col">
-                            <p>
-                                {{ post.transaction.receiver.country }}
-                            </p>
-                            <p>
-                                <Link :href="route('single.receiver.page', post.transaction.receiver.id)"
-                                      class="text-blue-700 hover:text-blue-900 hover:underline"
-                                >
+                                    </Link>
+                                </p>
+                            </td>
+                            <td class="px-6 py-3" scope="col">
+                                <p>
+                                    {{ post.transaction.receiver.country }}
+                                </p>
+                                <p>
+                                    <Link :href="route('single.receiver.page', post.transaction.receiver.id)"
+                                        class="text-blue-700 hover:text-blue-900 hover:underline">
                                     (View receiver)
-                                </Link>
-                            </p>
-                        </td>
-                        <td class="px-6 py-3" scope="col">
-                            <p>
-                                {{ parseFloat(post.transaction.payment_intent.amount / 100).toFixed(2) }}
-                                <span class="uppercase">
-                                    ({{ post.transaction.payment_intent.currency }})
-                            </span>
-                            </p>
+                                    </Link>
+                                </p>
+                            </td>
+                            <td class="px-6 py-3" scope="col">
+                                <p>
+                                    {{ parseFloat(post.transaction.payment_intent.amount / 100).toFixed(2) }}
+                                    <span class="uppercase">
+                                        ({{ post.transaction.payment_intent.currency }})
+                                    </span>
+                                </p>
 
-                            <Link :href="route('payment.intent.page', post.transaction.payment_intent.id)"
-                                  class="text-blue-700 hover:text-blue-900 hover:underline">
+                                <Link :href="route('payment.intent.page', post.transaction.payment_intent.id)"
+                                    class="text-blue-700 hover:text-blue-900 hover:underline">
                                 (View Payment Intent)
-                            </Link>
-                        </td>
-                        <td class="px-6 py-3 uppercase" scope="col">
-                            #{{ post.transaction.id }}
-                        </td>
-                        <td class="px-6 py-3" scope="col">
-                            Coming soon...
-                        </td>
-                    </tr>
+                                </Link>
+                            </td>
+                            <td class="px-6 py-3 uppercase" scope="col">
+                                #{{ post.transaction.id }}
+                            </td>
+                            <td class="px-6 py-3" scope="col">
+                                Coming soon...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <Pagination :links="props.posts.links"/>
+            <Pagination :links="props.posts.links" />
         </div>
 
     </AdminLayout>
