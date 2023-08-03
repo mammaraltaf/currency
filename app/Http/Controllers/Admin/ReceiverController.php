@@ -11,20 +11,24 @@ use Inertia\Response;
 class ReceiverController extends Controller
 {
 
-    public function receiversPage(Request $request): Response
+    public function receiversPage(): Response
     {
-        $columnName = $request->get('column')?$request->get('column'):'created_at';
-        $columnType = $request->get('type')?$request->get('type'):'desc';
-        if ($columnName != 'label') {
-            $query = Receiver::orderBy($columnName,$columnType);
-        } else {
-            $query = Receiver::join('banks', 'receivers.bank_id', '=', 'banks.id')
-                ->orderBy('banks.label', $columnType)
-                ->select('receivers.*');
+        $query = Receiver::orderBy('created_at', 'desc');
+
+        if (request()->has('q') && !empty(request('q')))  {
+            $search = request('q');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('country', 'like', '%' . $search . '%');
+            });
         }
-        $receivers = $query->paginate(25);
+        $receivers = $query->paginate(10);
+
         return Inertia::render('Admin/Receivers/Index', [
-            'receivers' => $receivers
+            'receivers' =>$receivers
         ]);
     }
 

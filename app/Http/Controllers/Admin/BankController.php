@@ -10,32 +10,33 @@ use App\Models\Bank;
 use App\Models\Country;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
-
 
 class BankController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $sort =  $request->get('column')?$request->get('column') : 'id';
-        $sortType =$request->get('type')?$request->get('type') : 'asc';
-        if ($sort != 'country') {
+        $query = Bank::whereNotNull('country_id');
 
-            $query = Bank::orderBy($sort, $sortType);
-        } else {
-            $query = Bank::join('countries', 'banks.country_id', '=', 'countries.id')
-                ->orderBy('countries.label', $sortType)
-                ->select('banks.*');
+        if (request()->has('q') && !empty(request('q'))) {
+            $search = request('q');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery->whereHas('country', function ($countryQuery) use ($search) {
+                    $countryQuery->where('label', 'like', '%' . $search . '%');
+                })
+                ->orWhere('label', 'like', '%' . $search . '%');
+            });
         }
 
-        $banks = $query->paginate(25);
+        $banks = $query->paginate(50);
+
         return Inertia::render('Admin/Banks/Index', [
             'banks' => $banks,
             'countries' => Country::supportedCountries(),
         ]);
     }
 
-    public function store(StoreBankRequest $request){
+    public function store(StoreBankRequest $request)
+    {
         return Bank::create($request->validated());
     }
 
@@ -44,9 +45,9 @@ class BankController extends Controller
         return $bank->update($request->validated());
     }
 
-    public function delete(DeleteBankRequest $request, Bank $bank): array|bool
+    public function delete(DeleteBankRequest $request, Bank $bank): array | bool
     {
-        if($bank->delete()){
+        if ($bank->delete()) {
             return ['id' => $bank->id];
         }
 

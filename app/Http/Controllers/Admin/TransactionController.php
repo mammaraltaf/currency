@@ -11,26 +11,24 @@ use Inertia\Response;
 
 class TransactionController extends Controller
 {
-    public function transactionsPage(Request $request): Response
-    {
-        $sort = $request->get('column') ? $request->get('column') : 'id';
-        $sortType = $request->get('type') ? $request->get('type') : 'asc';
-        $sortQuery = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('receivers', 'transactions.receiver_id', '=', 'receivers.id')
-            ->join('payment_intents', 'transactions.payment_intent_id', '=', 'payment_intents.id')
-            ->select('users.*', 'receivers.*', 'transactions.*');
 
-        if ($sort == 'user') {
-            $query = $sortQuery->orderBy('users.first_name', $sortType);
-        } elseif ($sort == 'receiver') {
-            $query = $sortQuery->orderBy('receivers.first_name', $sortType);
-        } elseif ($sort == 'amount') {
-            $query = $sortQuery->orderBy('payment_intents.amount', $sortType);
-        }  else {
-            $query = Transaction::with('user')->orderBy($sort, $sortType);
+    public function transactionsPage(): Response
+    {
+        $query = Transaction::with('user')->orderBy('created_at', 'desc');
+        if (request()->has('q') && !empty(request('q'))) {
+            $search = request('q');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('first_name', 'like', '%' . $search . '%')
+                        ->orWhere('last_name', 'like', '%' . $search . '%');
+                })
+                    ->orWhere('type', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhere('payment_status', 'like', '%' . $search . '%');
+            });
         }
 
-        $transactions = $query->paginate(25);
+        $transactions = $query->paginate(10);
         return Inertia::render('Admin/Transactions/Index', [
             'transactions' => $transactions,
         ]);
