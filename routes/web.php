@@ -15,6 +15,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MonerisPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,8 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/moneris',[\App\Http\Controllers\MonerisPaymentController::class,'payment'])->name('moneris.payment');
+/*tesing moneris*/
+Route::post('/moneris',[MonerisPaymentController::class,'payment'])->name('moneris.payment');
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
 Route::get('/services', [DashboardController::class, 'services'])->name('services.page');
 Route::get('/not-supported', [ErrorsController::class, 'notSupported'])->name('not.supported.page');
