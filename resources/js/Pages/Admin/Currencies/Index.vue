@@ -18,7 +18,6 @@ import { router } from '@inertiajs/vue3'
 
 const api = useAPI();
 const notification = useNotificationStore();
-let sortFlag = ref(1)
 const props = defineProps({
     currencies: {
         required: true,
@@ -70,33 +69,7 @@ const updateRate = (currency) => {
 const currencyAdded = () => {
     props.currencies.total++;
 }
-const sortValues = async (column) => {
-    console.log('column', column);
-    try {
-        console.log('sortFlag.value', sortFlag.value);
-        let sortType = sortFlag.value == 1 ? 'asc' : 'desc';
-        const res = await axios.get('/admin/currencies/' + column + '/' + sortType)
-        if (res) {
-            console.log('resposne', res);
-            props.currencies.data = res.data.data
-            if (sortFlag.value == 1) {
-                sortFlag.value++;
-            } else if(sortFlag.value >1) {
-                sortFlag.value--;
-            }
-            // notification.notify('Currency updated', 'success');
-            // let index = currencyArray.data.findIndex(oldInfo => oldInfo.id === editingCurrency.value.id);
-            // currencyArray.data.splice(index, 1, editingCurrency.value);
-            // endEdit();
-        }
-    } catch (errors) {
-        notification.notify('Error', 'error');
-        api.handleErrors(errors)
-    } finally {
-        api.requestCompleted();
-    }
 
-}
 // Deleting
 const deleteCurrency = async (currency) => {
     deletingCurrencyId.value = currency.id;
@@ -143,19 +116,33 @@ const updateCurrencyRates = async () => {
     }
 }
 
-
 // Search
-const searchValue = ref('');
+let searchValue = ref('');
 const search = () => {
-    router.visit(`?q=${searchValue.value}`);
+    router.visit(`?q=${searchValue.value}&column=${sortColumn.value}&type=${sortType.value}`);
 }
-
+// sorting
+// let sortFlag = ref(1)
+let sortColumn = ref('code')
+let sortType = ref('asc')
+let sortValues = (column) => {
+    sortColumn.value = column;
+    if (sortColumn.value === column) {
+        sortType.value = sortType.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortType.value = 'asc';
+    }
+    searchValue.value = searchValue.value != null ? searchValue.value : ""
+    router.visit(`?q=${searchValue.value}&column=${sortColumn.value}&type=${sortType.value}`);
+}
 const clearSearch = () => {
     router.visit(`?q=`);
 }
 
 onMounted(() => {
     searchValue.value = new URLSearchParams(window.location.search).get('q');
+    sortColumn.value = new URLSearchParams(window.location.search).get('column');
+    sortType.value = new URLSearchParams(window.location.search).get('type');
 });
 function setStatus(currency) {
     // if (condition) {

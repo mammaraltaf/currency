@@ -12,12 +12,15 @@ class UsersController extends Controller
 {
 
 
-    public function usersPage(): Response
+    public function usersPage(Request $request): Response
     {
+        $columnName = $request->get('column') ? $request->get('column') : 'created_at';
+        $columnType = $request->get('type') ? $request->get('type') : 'desc';
+        $query = User::whereDoesntHave('roles')
+            ->orderBy($columnName, $columnType);
+        $users = $query->paginate(25);
         return Inertia::render('Admin/Users/Index', [
-            'users' => User::whereDoesntHave('roles')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10)
+            'users' => $users,
         ]);
     }
 

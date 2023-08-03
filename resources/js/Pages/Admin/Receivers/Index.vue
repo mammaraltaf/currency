@@ -2,6 +2,8 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import Pagination from "@/Components/Custom/Pagination.vue";
 import {Head, Link} from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3'
+import {useSortingStore} from "@/stores/sorting";
 
 const props = defineProps({
     receivers: {
@@ -10,6 +12,12 @@ const props = defineProps({
     }
 })
 
+// sorting
+const store = useSortingStore();
+const sort = (column) => {
+  store.sortValues(column);
+  router.visit(`?column=${store.column}&type=${store.type}`);
+};
 </script>
 
 <template>
@@ -39,19 +47,19 @@ const props = defineProps({
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('first_name')">
                             Name
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('email')">
                             Email
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('phone')">
                             Phone
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('country')">
                             Country Code
                         </th>
-                        <th class="px-6 py-3" scope="col">
+                        <th class="px-6 py-3" scope="col" @click="sort('label')">
                             Bank
                         </th>
                     </tr>
@@ -75,7 +83,7 @@ const props = defineProps({
                             {{ receiver.country }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ receiver.bank }}
+                            {{ receiver.bank.label }}
                         </td>
                     </tr>
                     </tbody>
@@ -94,3 +102,8 @@ export default {
     name: 'Receivers'
 }
 </script>
+<style scoped>
+th:not(:last-child) {
+    cursor: pointer;
+}
+</style>
