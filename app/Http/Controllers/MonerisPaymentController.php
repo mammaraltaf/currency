@@ -67,9 +67,9 @@ class MonerisPaymentController extends Controller
         try {
             /*Create a gateway instance using dependency injection*/
             $gateway = Omnipay::create('Moneris');
-            $gateway->setMerchantId(config('payment.moneris.merchant_id'));
-            $gateway->setMerchantKey(config('payment.moneris.merchant_key'));
-            $gateway->setTestMode(config('payment.moneris.test_mode'));
+            $gateway->setMerchantId(config('services.moneris.merchant_id') ?? 'monca07926');
+            $gateway->setMerchantKey(config('services.moneris.merchant_key') ?? 'oVxLG8KP1gTFf66wkFXZ');
+            $gateway->setTestMode(config('services.moneris.test_mode') ?? true);
 
             /*Set the parameters for the purchase request*/
             $parameters = [

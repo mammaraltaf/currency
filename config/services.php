@@ -59,4 +59,10 @@ return [
         'token' => env('TELEGRAM_BOT_TOKEN'),
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
+
+    'moneris' => [
+        'merchant_id' => env('MONERIS_MERCHANT_ID'),
+        'merchant_key' => env('MONERIS_MERCHANT_KEY'),
+        'test_mode' => env('MONERIS_TEST_MODE', true),
+    ],
 ];
