@@ -18,8 +18,8 @@ class CurrencyController extends Controller
 {
     public function currenciesPage(Request $request):Response
     {
-        $columnName = $request->get('column')?$request->get('column'):'code';
-        $columnType = $request->get('type')?$request->get('type'):'asc';
+        $columnName = $request->get('column')!='null'?$request->get('column'):'code';
+        $columnType = $request->get('type')!='null'?$request->get('type'):'asc';
         $fetched_at = Setting::first() ? Setting::first()->main['fetched_at'] : null;
         // dd($columnName,$columnType);
         $query = Currency::with(['country:label,id,currency_id'])->orderBy($columnName,$columnType);

@@ -19,8 +19,8 @@ class AdminController extends Controller
 
     public function adminsPage(Request $request): Response
     {
-        $columnName = $request->get('column') ? $request->get('column') : 'created_at';
-        $columnType = $request->get('type') ? $request->get('type') : 'desc';
+        $columnName = $request->get('column')!='null'?$request->get('column'):'created_at';
+        $columnType = $request->get('type')!='null'?$request->get('type'):'desc';
         $query = User::whereHas('roles')->orderBy($columnName, $columnType);
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');

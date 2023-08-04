@@ -13,8 +13,8 @@ class ReceiverController extends Controller
 
     public function receiversPage(Request $request): Response
     {
-        $columnName = $request->get('column')?$request->get('column'):'created_at';
-        $columnType = $request->get('type')?$request->get('type'):'desc';
+        $columnName = $request->get('column')!='null'?$request->get('column'):'created_at';
+        $columnType = $request->get('type')!='null'?$request->get('type'):'desc';
         if ($columnName != 'label') {
             $query = Receiver::orderBy($columnName,$columnType);
         } else {

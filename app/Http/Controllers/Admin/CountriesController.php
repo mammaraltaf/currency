@@ -16,8 +16,8 @@ class CountriesController extends Controller
     public function countriesPage(Request $request): Response
     {
         // $query = Country::query();
-        $sort = $request->get('column')!=null ? $request->get('column') : 'id';
-        $sortType = $request->get('type')!=null ? $request->get('type') : 'asc';
+        $sort = $request->get('column')!='null' ? $request->get('column') : 'id';
+        $sortType = $request->get('type')!='null' ? $request->get('type') : 'asc';
         if ($sort != 'name') {
             $query = Country::orderBy($sort, $sortType);
         } else {
