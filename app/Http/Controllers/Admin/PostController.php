@@ -10,20 +10,18 @@ use App\Http\Requests\Admin\Posts\StorePostRequest;
 use App\Http\Requests\Admin\Posts\DeletePostRequest;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use App\Models\Transaction;
+
 
 class PostController extends Controller
 {
     public function postsPage(Request $request): Response
     {
+        ##the sorting and filter values are getting to the backend please set the boht accordingly
+        ##update it according to the condition just added to check if the crud working
         $sort = $request->get('column') ? $request->get('column') : 'created_at';
         $sortType = $request->get('type') ? $request->get('type') : 'desc';
-
-        $query = Post::join('transactions', 'posts.transaction_id', '=', 'transactions.id')
-            ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('receivers', 'transactions.receiver_id', '=', 'receivers.id')
-            ->join('payment_intents', 'transactions.payment_intent_id', '=', 'payment_intents.id')
-            ->select('posts.*', 'users.*', 'receivers.*', 'payment_intents.*', 'transactions.*');
-
+        $query = Post::with('transaction.user')->with('transaction.receiver')->with('transaction.paymentIntent');
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');
             $query->where(function ($innerQuery) use ($search) {
@@ -33,31 +31,33 @@ class PostController extends Controller
                     ->orWhere('status', 'like', '%' . $search . '%');
             });
         }
-
+        ##UPDATE THE SORTING ACCORDING TO THE CODE
         if ($sort == 'user') {
-            $query = $sortQuery->orderBy('users.first_name', $sortType);
+            $query = $query->orderBy('users.first_name', $sortType);
         } elseif ($sort == 'receiver') {
-            $query = $sortQuery->orderBy('receivers.first_name', $sortType);
+            $query = $query->orderBy('receivers.first_name', $sortType);
         } elseif ($sort == 'amount') {
-            $query = $sortQuery->orderBy('payment_intents.amount', $sortType);
+            $query = $query->orderBy('transaction.paymentIntent.amount', $sortType);
         } elseif ($sort == 'id') {
-            $query = $sortQuery->orderBy('transactions.id', $sortType);
+            $query = $query->orderBy('transaction.id', $sortType);
         } else {
-            $query = Post::orderBy($sort, $sortType);
+            $query = $query->orderBy($sort, $sortType);
         }
 
         $posts = $query->paginate(10);
-        $countries = Country::select('code','id','label')->get();
+        $transactions = Transaction::with('user:first_name,id,last_name')->select('id','user_id','receiver_id')->get();
         return Inertia::render('Admin/Posts/Index', [
             'posts' => $posts,
-            'countries' => $countries,
+            'transactions' => $transactions,
         ]);
+        ##update it according to the condition just added to check if the crud working
     }
 
     public function store(StorePostRequest $request)
     {
-        dd($request->all());
-        return Post::create($request->validated());
+        $response = Post::create($request->validated());
+        $response->load('transaction.user', 'transaction.receiver', 'transaction.paymentIntent');
+        return $response;
     }
 
     public function delete(DeletePostRequest $request, Post $post): array | bool

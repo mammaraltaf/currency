@@ -15,21 +15,26 @@ import { useNotificationStore } from "@/stores/notification";
 import SaveIcon from "@/Icons/SaveIcon.vue";
 import TextInput from "@/Components/TextInput.vue";
 
-
+const api = useAPI();
+const notification = useNotificationStore();
 const props = defineProps({
     posts: {
         required: true,
         type: Object
     },
-    countries: {
+    transactions: {
         required: true,
         type: Object
     }
 
 })
+console.log('posts',props.posts);
 // Adding
-const postAdded = () => {
+const postAdded = (data) => {
+    console.log('daya',data);
+    props.posts.data.push(data);
     props.posts.total++;
+
 }
 
 // Editing:
@@ -44,14 +49,10 @@ const edit = (post) => {
 
     showEditDialog.value = true;
     Edit;
-    return { showEditDialog };
+    return { showEditDialog,Edit };
 }
 function closeEditDialog($isFetchData) {
-    console.log('$isFetchData', $isFetchData);
-    // if ($isFetchData) {
-    //     props.posts.data.splice(index.value, 1, currencyData.value);
-
-    // }
+        props.posts.data.splice(index.value, 1, editingPost.value);
     showEditDialog.value = false;
     return { showEditDialog };
 }
@@ -121,7 +122,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Edit :show="showEditDialog" :postData="editingPost" v-if="showEditDialog"
+    <Edit :show="showEditDialog" :transactions="props.transactions" :postData="editingPost" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
     <Head title="Posts">
@@ -144,9 +145,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <Add :countries="props.countries" @postAdded="postAdded" />
+            <Add :transactions="props.transactions"  @postAdded="postAdded" />
             <div class="flex items-end gap-3 ">
-                <TextInput v-model="searchValue" class="mb-8" label="Search by post code" placeholder="USD"
+                <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search"
                     title="searchValue" v-on:keyup.enter="search" />
 
                 <button @click="search" type="button"
@@ -221,7 +222,7 @@ onMounted(() => {
                                 <p>
                                     {{ parseFloat(post.transaction.payment_intent.amount / 100).toFixed(2) }}
                                     <span class="uppercase">
-                                        ({{ post.transaction.payment_intent.currency }})
+                                        ({{ post.transaction.payment_intent.post }})
                                     </span>
                                 </p>
 
@@ -234,7 +235,17 @@ onMounted(() => {
                                 #{{ post.transaction.id }}
                             </td>
                             <td class="px-6 py-3" scope="col">
-                                Coming soon...
+                                <DeleteIcon @click="deletePost(post)"
+                                    class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1" />
+
+                                <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
+                                    class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
+
+                                <EditIcon @click="edit(post)"
+                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
+
+                                <Spinner v-if="api.isLoading.value && deletingPostId === post.id"
+                                    class="button-spinner-center action-btn" />
                             </td>
                         </tr>
                     </tbody>
