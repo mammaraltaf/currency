@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\UsersController;
 use Illuminate\Support\Facades\Route;
 
 
-// Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
+Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // admins
     Route::get('/admin', [AdminController::class, 'adminPanelPage'])->name('admin.panel.page');
     Route::get('/admin/admins', [AdminController::class, 'adminsPage'])->name('admins.page');
@@ -51,4 +51,4 @@ use Illuminate\Support\Facades\Route;
     // receivers
     Route::get('/admin/receivers', [ReceiverController::class, 'receiversPage'])->name('receivers.page');
     Route::get('/admin/receivers/{receiver}', [ReceiverController::class, 'singleReceiverPage'])->name('single.receiver.page');
-// });
+});
