@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 
 export const useSortingStore = defineStore('sorting', {
   state: () => ({
-    column: 'code',
+    column: 'id',
     type: 'asc',
   }),
   actions: {

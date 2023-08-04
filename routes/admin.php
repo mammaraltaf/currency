@@ -24,6 +24,7 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     Route::get('/admin/posts', [PostController::class, 'postsPage'])->name('posts.page');
     Route::post('/admin/posts/store', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/admin/posts/delete/{post}', [PostController::class, 'delete'])->name('posts.delete');
+    // UPDATE RUOUTE MISSING
 
     // banks
     Route::get('/admin/banks', [BankController::class, 'index'])->name('banks.page');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin\Countries;
+namespace App\Http\Requests\Admin\Posts;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,11 +23,11 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        dd(' i mhere');
         return [
             'transaction_id' => ['required', 'numeric'],
-            'country_code' => ['required', 'min:3', 'max:199', 'string'],
-            'status' => ['required', 'min:3', 'max:199', 'string'],
+            'country_code' => ['required', 'min:2', 'max:199', 'string'],
+            // 'status' => ['required', 'min:3', 'max:199', 'string'],
+            'status' => ['required','boolean'],
         ];
     }
 }

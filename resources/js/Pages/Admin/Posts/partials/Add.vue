@@ -2,29 +2,33 @@
 import {ref, reactive, computed} from "vue";
 import {useAPI} from "@/Composables/useAPI";
 import {useNotificationStore} from "@/stores/notification";
-import TextInput from "@/Components/TextInput.vue";
 import ToggleSwitch from "@/Components/Custom/ToggleSwitch.vue";
 import SelectInput from "@/Components/Custom/SelectInput.vue";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import { countries } from "@/helpers/countries";
-
+console.log('countires',countries);
 const api = useAPI();
 const notification = useNotificationStore();
 
 const props = defineProps({
-    countries: {
+
+    transactions:{
         required: true,
         type: Object
     }
-
 });
 let allCountries = computed(() => {
-    return props.countries.map((country) => ({
-    label: country.code +"("+country.label+")",
-    value: country.id
+    return countries.map((country) => ({
+    label: country.value +"("+country.label+")",
+    value: country.value
   }));
 });
-console.log('countries',props.countries, allCountries);
+let allTransactions = computed(() => {
+    return props.transactions.map((transaction) => ({
+    label: transaction.user.first_name+' '+transaction.user.last_name+"(Sender)",
+    value: transaction.id
+  }));
+});
 // Emits
 const emit = defineEmits(['postAdded']);
 
@@ -42,7 +46,7 @@ const endAdd = () => {
 }
 
 const post = reactive({
-    'transaction_id': '1',
+    'transaction_id': '',
     'country_code': '',
     'status': false,
 })
@@ -63,7 +67,7 @@ const addPost = async () => {
         if (res.data.id || res.data.status === 'success') {
             notification.notify('Post added', 'success');
             endAdd();
-            emit('postAdded');
+            emit('postAdded',res.data);
         }
     } catch (errors) {
         notification.notify('Error', 'error');
@@ -84,13 +88,23 @@ const addPost = async () => {
 
         <form v-show="formOpened" class="border-gray-400 border rounded-lg p-6 mb-8">
             <div class="grid gap-6 mb-10 md:grid-cols-2">
-                <TextInput
+                <!-- <TextInput
                     v-model="post.transaction_id"
                     :errors="api.errors.value?.transaction_id"
                     label="Post Transection Id"
                     placeholder="Transection ID"
                     required
                     title="transaction"
+                /> -->
+                <SelectInput
+                    v-model="post.transaction_id"
+                    :errors="api.errors.value?.transaction_id"
+                    :options="allTransactions"
+                    label="Transactions"
+                    required
+                    placeholder=" Select "
+                    title="Transaction"
+                    type="text"
                 />
                  <SelectInput
                     v-model="post.country_code"
