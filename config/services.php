@@ -61,8 +61,8 @@ return [
     ],
 
     'moneris' => [
-        'merchant_id' => env('MONERIS_MERCHANT_ID'),
-        'merchant_key' => env('MONERIS_MERCHANT_KEY'),
+        'merchant_id' => env('MONERIS_MERCHANT_ID') ?? 'monca07926',
+        'merchant_key' => env('MONERIS_MERCHANT_KEY') ?? 'oVxLG8KP1gTFf66wkFXZ',
         'test_mode' => env('MONERIS_TEST_MODE', true),
     ],
 ];

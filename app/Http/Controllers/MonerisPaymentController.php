@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Omnipay\Omnipay;
 
 
@@ -89,8 +90,9 @@ class MonerisPaymentController extends Controller
 
             /*Send the purchase request*/
             // dd($parameters);
-
+            Log::info('Request: ' . print_r($parameters, true));
             $response = $gateway->purchase($parameters)->send();
+            Log::info('Response: ' . $response->getData());
             /*Check the response - success or fail*/
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
