@@ -17,8 +17,8 @@ class BankController extends Controller
     public function index(Request $request): Response
     {
         $query = Bank::whereNotNull('country_id');
-        $sort = $request->get('column')!='null' ? $request->get('column') : 'id';
-        $sortType =$request->get('type')!='null'? $request->get('type') : 'asc';
+        $sort = $request->get('column')!=null? $request->get('column') : 'id';
+        $sortType =$request->get('type')!=null? $request->get('type') : 'asc';
         if ($sort != 'country') {
             $query = $query->orderBy($sort, $sortType);
         } else {

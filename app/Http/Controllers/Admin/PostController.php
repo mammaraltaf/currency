@@ -19,8 +19,8 @@ class PostController extends Controller
     {
         ##the sorting and filter values are getting to the backend please set the boht accordingly
         ##update it according to the condition just added to check if the crud working
-        $sort = $request->get('column')!='null' ? $request->get('column') : 'created_at';
-        $sortType =$request->get('type')!='null'? $request->get('type') : 'desc';
+        $sort = $request->get('column')!=null ? $request->get('column') : 'created_at';
+        $sortType =$request->get('type')!=null? $request->get('type') : 'desc';
         $query = Post::with('transaction.user')->with('transaction.receiver')->with('transaction.paymentIntent');
         if (request()->has('q') && !empty(request('q'))) {
             $search = request('q');

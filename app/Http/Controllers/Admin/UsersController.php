@@ -14,8 +14,8 @@ class UsersController extends Controller
 
     public function usersPage(Request $request): Response
     {
-        $columnName = $request->get('column')!='null' ? $request->get('column') : 'created_at';
-        $columnType =$request->get('type')!='null'? $request->get('type') : 'desc';
+        $columnName = $request->get('column')!=null ? $request->get('column') : 'created_at';
+        $columnType =$request->get('type')!=null? $request->get('type') : 'desc';
         $query = User::whereDoesntHave('roles')
             ->orderBy($columnName, $columnType);
         if (request()->has('q') && !empty(request('q')))  {
