@@ -40,6 +40,7 @@ const country = reactive({
     'can_send': '',
     'can_receive': '',
     'currency_id': null,
+    'status': false,
 })
 
 const sendOptions = [
@@ -149,6 +150,11 @@ const addCountry = async () => {
                     value-accessor="id"
                     label-accessor="name"
                 />
+                <div class="w-full md:w-96 flex  justify-start relative">
+                    <label>Status</label>
+                    <input type="checkbox" :class="country.status ? 'slider-checked' : ''" class="slider"
+                        v-model="country.status" />
+                </div>
             </div>
 
             <div class="flex gap-4 items-center">
@@ -178,3 +184,42 @@ export default {
     name: "CreateCountry"
 }
 </script>
+<style scoped>
+.slider {
+    /* -webkit-appearance: none; */
+    width: 40px;
+    height: 20px;
+    border-radius: 20px;
+    background: #c6c6c6;
+    outline: none;
+    opacity: 0.7;
+    transition: .2s;
+    margin: 0 10px;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-checked {
+    background-color: #1C64F2;
+}
+</style>

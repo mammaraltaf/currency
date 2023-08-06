@@ -5,6 +5,8 @@ import { useNotificationStore } from "@/stores/notification";
 import { router, usePage } from "@inertiajs/vue3";
 import { currencies } from "@/helpers/currencies";
 import { currencies_countries } from "@/helpers/currencies_countries";
+import cardInfo from "@/Pages/Transaction/Partials/forms/CardInfo.vue";
+
 import Spinner from "@/Components/Custom/Spinner.vue";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
 import NewTextInput from "@/Components/Design/NewTextInput.vue";
@@ -31,80 +33,29 @@ const props = defineProps({
         type: Array
     }
 })
-const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-];
-let expiryYear = ref()
-
-const expiryYears = computed(() => {
-    const currentYear = new Date().getFullYear();
-    const numberOfYearsToShow = 10; // Adjust this to show how many future years you want to display
-    const years = [];
-
-    for (let i = 0; i < numberOfYearsToShow; i++) {
-        let option = { 'label': currentYear + i, 'value': currentYear + i }
-        years.push(option);
-    }
-    return years;
-});
-
-let allMonths = computed(() => {
-    return monthNames.map((month, index) => ({
-    label: month,
-    value: (index + 1).toString().padStart(2, '0')
-  }));
-});
-let expiryMonths = ref(allMonths.value);
-watch(expiryYear, (newYear) => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    let months = [];
-    if (newYear == currentYear) {
-        let upcomingMonths = monthNames.slice(currentMonth - 1); // Show upcoming months
-        console.log('upcomingMonths',upcomingMonths, currentMonth);
-        let j = 0;
-        for (let i = 12; i > 12 - upcomingMonths.length; i--) {
-            j++
-            months.push({ 'label': upcomingMonths[j-1], 'value': currentMonth+j-1 });
-        }
-    } else {
-        for (let i = 0; i < monthNames.length; i++) {
-            months.push({ 'label': monthNames[i], 'value': i + 1 });
-        }
-
-    }
-        expiryMonths.value = months
-        transactionInfo.expiry_year = newYear;
-
-});
-
+let showCardInfoDialog = ref(false)
+const validationError = ref('');
 const transactionInfo = reactive({
     'amount': '100',
     'currency': currencies_countries[geoLocationDetails.country_code],
-    'card_number': '411111111111',
-    'expiry_year': expiryYear.value,
-    'expiry_month': '',
-    'cvv': '1111',
     'country': '',
 });
-const saveTransactionInfo = async () => {
-    api.startRequest();
-
-    try {
-        console.log('transactionInfo',transactionInfo);
-        const res = await axios.post('/moneris', transactionInfo);
-        if (res.data.status === 'success') {
-            goForward('/receiver-info?payment-reference-identification=' + res.data.paymentIntent.id + '&country=' + transactionInfo.country);
-        } else {
-            notification.notify('Unexpected error happen', 'error');
-        }
-    } catch (errors) {
-        api.handleErrors(errors)
-        notification.notify('Invalid data submitted', 'error');
-    } finally {
-        api.requestCompleted();
+const openCardInfo = () => {
+    if (!transactionInfo.amount || !transactionInfo.currency || !transactionInfo.country) {
+        validationError.value = 'Please fill in all the required fields.';
+        return;
     }
+
+    showCardInfoDialog.value = true;
+    cardInfo;
+    validationError.value =""
+    return { transactionInfo, validationError, showCardInfoDialog };
+
+}
+function closeCardInfoDialog($isFetchData) {
+    console.log('$isFetchData', $isFetchData);
+    showCardInfoDialog.value = false;
+    return { showCardInfoDialog };
 }
 
 const convertCurrencyByCountryCode = async () => {
@@ -129,9 +80,7 @@ const convertCurrencyByCountryCode = async () => {
     }
 }
 
-const goForward = (url) => {
-    router.get(url);
-}
+
 
 const setTransactionValues = () => {
     transactionInfo.amount = parseFloat((props.user.handled_transaction.payment_intent.amount_in_receiver_currency / 100).toFixed(2));
@@ -161,6 +110,8 @@ const receiverGetsAmount = computed(() => {
 
 <template>
     <div class="transaction-info-form-wrapper">
+        <cardInfo :show="showCardInfoDialog" :user="props.user" :transactionInfo="transactionInfo" v-if="showCardInfoDialog"
+            v-on:close="closeCardInfoDialog($event)" />
         <NewTextInput v-model="transactionInfo.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
             label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number" />
 
@@ -168,18 +119,7 @@ const receiverGetsAmount = computed(() => {
             :errors="api.errors.value?.currency" :options="currencies" label="Currency"
             placeholder="Currency of your payment card" required title="country" class="fifty-form-input" type="text"
             @update:modelValue="convertCurrencyByCountryCode" />
-        <NewTextInput v-model="transactionInfo.card_number"
-            :errors="api.errors.value?.card_number" label="Card Number" placeholder="99" required title="amount"
-            class="fifty-form-input" type="number" />
-        <NewSelectInput v-model="expiryYear"  :errors="api.errors.value?.expiry_year"
-            :options="expiryYears" label="Expiry Year" placeholder="Expiry Year of your payment card" required
-            title="country" class="fifty-form-input" type="text" />
-        <NewSelectInput v-model="transactionInfo.expiry_month"
-            :errors="api.errors.value?.expiryMonth" :options="expiryMonths" label="Expiry Month"
-            placeholder="Expiry Month of your payment card" required title="expiry month" class="fifty-form-input"
-            type="text" />
-        <NewTextInput v-model="transactionInfo.cvv" :errors="api.errors.value?.cvv"
-            label="cvv" placeholder="99" required title="CVV" class="fifty-form-input" type="number" />
+
         <NewSelectInput v-model="transactionInfo.country" :disabled="isTransactionPreset"
             :errors="api.errors.value?.country" :options="receivingCountries" label="Receiver Country"
             label-accessor="label" placeholder="Country" required title="country" class="fifty-form-input country"
@@ -198,11 +138,11 @@ const receiverGetsAmount = computed(() => {
                 </div>
             </div>
         </transition>
-
+        <p class="text-danger">{{ validationError }}</p>
         <div class="action-buttons">
             <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" />
 
-            <NewActionButton :isLoading="api.isLoading.value" type="button" title="Continue" @click="saveTransactionInfo" />
+            <NewActionButton :isLoading="api.isLoading.value" type="button" title="Continue" @click="openCardInfo" />
         </div>
     </div>
 </template>

@@ -8,10 +8,11 @@ import EditIcon from "@/Icons/EditIcon.vue";
 import { useAPI } from "@/Composables/useAPI";
 import { useNotificationStore } from "@/stores/notification";
 import Spinner from "@/Components/Custom/Spinner.vue";
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import EditBank from "@/Pages/Admin/Banks/partials/EditBank.vue";
 import { router } from '@inertiajs/vue3'
-import {useSortingStore} from "@/stores/sorting";
+import { useSortingStore } from "@/stores/sorting";
+import TextInput from "@/Components/TextInput.vue";
 
 
 const api = useAPI();
@@ -71,13 +72,24 @@ const deleteBank = async (bank) => {
     }
 }
 
+// Search
+let searchValue = ref('');
+const search = () => {
+    router.visit(`?q=${searchValue.value}&column=${store.type}&type=${store.type}`);
+}
 
 // sorting
 const store = useSortingStore();
 const sort = (column) => {
-  store.sortValues(column);
-  router.visit(`?column=${store.column}&type=${store.type}`);
+    store.sortValues(column);
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 };
+const clearSearch = () => {
+    router.visit(`?q=`);
+}
+onMounted(() => {
+    searchValue.value = new URLSearchParams(window.location.search).get('q');
+});
 </script>
 
 <template>
@@ -106,7 +118,20 @@ const sort = (column) => {
 
             <EditBank v-if="editedBank.value?.id" @endEdit="endEdit" @bankEdited="bankEdited" :edited-bank="editedBank"
                 :countries="countries" />
+            <div class="flex items-end gap-3 ">
+                <TextInput v-model="searchValue" class="mb-8" label="Search" placeholder="Search" title="searchValue"
+                    v-on:keyup.enter="search" />
 
+                <button @click="search" type="button"
+                    class="mb-8 flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Search
+                </button>
+
+                <button v-if="searchValue" @click="clearSearch" type="button"
+                    class="mb-8 flex items-center text-blue-700 bg-white border border-blue-700 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Clear
+                </button>
+            </div>
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -136,7 +161,8 @@ const sort = (column) => {
                                 {{ bank.label }}
                             </td>
                             <td class="px-6 py-4">
-                                {{ bank.country ? bank.country.label : 'N/A' }} ({{ bank.country ? bank.country.code : 'N/A' }})
+                                {{ bank.country ? bank.country.label : 'N/A' }} ({{ bank.country ? bank.country.code : 'N/A'
+                                }})
                             </td>
                             <td class="px-6 py-4 flex gap-4 items-center">
                                 <DeleteIcon @click="deleteBank(bank)"

@@ -1,33 +1,33 @@
 <script setup>
-import {ref, reactive, computed} from "vue";
-import {useAPI} from "@/Composables/useAPI";
-import {useNotificationStore} from "@/stores/notification";
+import { ref, reactive, computed } from "vue";
+import { useAPI } from "@/Composables/useAPI";
+import { useNotificationStore } from "@/stores/notification";
 import ToggleSwitch from "@/Components/Custom/ToggleSwitch.vue";
 import SelectInput from "@/Components/Custom/SelectInput.vue";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import { countries } from "@/helpers/countries";
-console.log('countires',countries);
+console.log('countires', countries);
 const api = useAPI();
 const notification = useNotificationStore();
 
 const props = defineProps({
 
-    transactions:{
+    transactions: {
         required: true,
         type: Object
     }
 });
 let allCountries = computed(() => {
     return countries.map((country) => ({
-    label: country.value +"("+country.label+")",
-    value: country.value
-  }));
+        label: country.value + "(" + country.label + ")",
+        value: country.value
+    }));
 });
 let allTransactions = computed(() => {
     return props.transactions.map((transaction) => ({
-    label: transaction.user.first_name+' '+transaction.user.last_name+"(Sender)",
-    value: transaction.id
-  }));
+        label: transaction.user.first_name + ' ' + transaction.user.last_name + "(Sender)",
+        value: transaction.id
+    }));
 });
 // Emits
 const emit = defineEmits(['postAdded']);
@@ -67,7 +67,7 @@ const addPost = async () => {
         if (res.data.id || res.data.status === 'success') {
             notification.notify('Post added', 'success');
             endAdd();
-            emit('postAdded',res.data);
+            emit('postAdded', res.data);
         }
     } catch (errors) {
         notification.notify('Error', 'error');
@@ -80,8 +80,9 @@ const addPost = async () => {
 </script>
 
 <template>
-    <div >
-        <button @click="openForm" type="button" class="mb-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+    <div>
+        <button @click="openForm" type="button"
+            class="mb-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
             Add new post
         </button>
 
@@ -96,50 +97,30 @@ const addPost = async () => {
                     required
                     title="transaction"
                 /> -->
-                <SelectInput
-                    v-model="post.transaction_id"
-                    :errors="api.errors.value?.transaction_id"
-                    :options="allTransactions"
-                    label="Transactions"
-                    required
-                    placeholder=" Select "
-                    title="Transaction"
-                    type="text"
-                />
-                 <SelectInput
-                    v-model="post.country_code"
-                    :errors="api.errors.value?.country_code"
-                    :options="allCountries"
-                    label="Country Code"
-                    required
-                    placeholder=" Select "
-                    title="Country Code"
-                    type="text"
-                />
+                <SelectInput v-model="post.transaction_id" :errors="api.errors.value?.transaction_id"
+                    :options="allTransactions" label="Transactions" required placeholder=" Select " title="Transaction"
+                    type="text" />
+                <SelectInput v-model="post.country_code" :errors="api.errors.value?.country_code" :options="allCountries"
+                    label="Country Code" required placeholder=" Select " title="Country Code" type="text" />
                 <div>
                     <label>Status</label>
-                <input type="checkbox" :class="post.status ? 'slider-checked' : ''"
-                                    class="slider" v-model="post.status"
-                                 />
+                    <input type="checkbox" :class="post.status ? 'slider-checked' : ''" class="slider"
+                        v-model="post.status" />
                 </div>
 
             </div>
 
             <div class="flex gap-4 items-center">
-                <button
-                    @click="addPost"
-                    type="button"
+                <button @click="addPost" type="button"
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Add
                 </button>
-                <button
-                    type="button"
-                    @click="endAdd"
+                <button type="button" @click="endAdd"
                     class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
                     Cancel
                 </button>
 
-                <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn"/>
+                <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn" />
             </div>
 
         </form>

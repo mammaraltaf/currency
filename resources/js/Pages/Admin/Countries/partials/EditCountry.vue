@@ -70,6 +70,8 @@ onMounted(() => {
     localCountry.can_receive = props.editedCountry.value.can_receive;
     localCountry.currency_id = props.editedCountry.value.currency_id;
     localCountry.currency = props.editedCountry.value.currency;
+    // when the status column is added chencge this one
+    localCountry.status = props.editedCountry.value.status?props.editedCountry.value.status:false;
 })
 
 </script>
@@ -139,7 +141,11 @@ onMounted(() => {
                     value-accessor="id"
                     label-accessor="name"
                 />
-
+                <div class="w-full md:w-96 flex  justify-start relative">
+                    <label>Status</label>
+                    <input type="checkbox" :class="localCountry.status ? 'slider-checked' : ''" class="slider"
+                        v-model="localCountry.status" />
+                </div>
 
             </div>
 
@@ -170,3 +176,42 @@ export default {
     name: "EditCountry"
 }
 </script>
+<style scoped>
+.slider {
+    /* -webkit-appearance: none; */
+    width: 40px;
+    height: 20px;
+    border-radius: 20px;
+    background: #c6c6c6;
+    outline: none;
+    opacity: 0.7;
+    transition: .2s;
+    margin: 0 10px;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-checked {
+    background-color: #1C64F2;
+}
+</style>

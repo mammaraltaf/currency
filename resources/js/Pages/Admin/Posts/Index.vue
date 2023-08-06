@@ -28,10 +28,10 @@ const props = defineProps({
     }
 
 })
-console.log('posts',props.posts);
+console.log('posts', props.posts);
 // Adding
 const postAdded = (data) => {
-    console.log('daya',data);
+    console.log('daya', data);
     props.posts.data.push(data);
     props.posts.total++;
 
@@ -49,16 +49,21 @@ const edit = (post) => {
 
     showEditDialog.value = true;
     Edit;
-    return { showEditDialog,Edit };
+    return { showEditDialog, Edit };
 }
 function closeEditDialog($isFetchData) {
-        props.posts.data.splice(index.value, 1, editingPost.value);
+    props.posts.data.splice(index.value, 1, editingPost.value);
     showEditDialog.value = false;
+    index.value = null
+
     return { showEditDialog };
 }
 // Deleting
+let deletingPostId = ref();
 const deletePost = async (post) => {
+    console.log(post);
     deletingPostId.value = post.id;
+    index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === post.id);
 
     api.startRequest();
 
@@ -69,6 +74,8 @@ const deletePost = async (post) => {
             notification.notify('Post deleted', 'success');
             post.id = 'deleted';
             props.posts.total--;
+            props.posts.rows.splice(index.value, 1);
+            index.value = null
         }
     } catch (errors) {
         notification.notify('Error, this base post can not be deleted.', 'error');
@@ -103,12 +110,13 @@ const updatePostRates = async () => {
 }
 // sorting
 const store = useSortingStore();
+let searchValue = ref('');
+
 const sort = (column) => {
     store.sortValues(column);
-    router.visit(`?column=${store.column}&type=${store.type}`);
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 };
 // Search
-let searchValue = ref('');
 const search = () => {
     router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 }
@@ -145,10 +153,10 @@ onMounted(() => {
                 </div>
             </div>
 
-            <Add :transactions="props.transactions"  @postAdded="postAdded" />
+            <Add :transactions="props.transactions" @postAdded="postAdded" />
             <div class="flex items-end gap-3 ">
-                <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search"
-                    title="searchValue" v-on:keyup.enter="search" />
+                <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
+                    v-on:keyup.enter="search" />
 
                 <button @click="search" type="button"
                     class="mb-8 flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -241,10 +249,10 @@ onMounted(() => {
                                 <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
                                     class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
 
-                                <EditIcon @click="edit(post)"
-                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
+                                <!-- <EditIcon @click="edit(post)"
+                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" /> -->
 
-                                <Spinner v-if="api.isLoading.value && deletingPostId === post.id"
+                                <Spinner v-if="api.isLoading.value && deletingPostId.value === post.id"
                                     class="button-spinner-center action-btn" />
                             </td>
                         </tr>

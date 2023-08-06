@@ -45,10 +45,9 @@ const edit = (currency) => {
 }
 function closeEditDialog($isFetchData) {
     console.log('$isFetchData', $isFetchData);
-    // if ($isFetchData) {
-    //     props.currencies.data.splice(index.value, 1, currencyData.value);
-
-    // }
+    if ($isFetchData) {
+        props.currencies.data.splice(index.value, 1, $isFetchData);
+    }
     showEditDialog.value = false;
     return { showEditDialog };
 }
@@ -197,7 +196,7 @@ function setStatus(currency) {
             </div>
 
             <div class="flex items-end gap-3 ">
-                <TextInput v-model="searchValue" class="mb-8" label="Search by currency code" placeholder="USD"
+                <TextInput v-model="searchValue" class="mb-8" label="Search by currency code" placeholder="Search"
                     title="searchValue" v-on:keyup.enter="search" />
 
                 <button @click="search" type="button"

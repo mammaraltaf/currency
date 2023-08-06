@@ -2,6 +2,9 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import Pagination from "@/Components/Custom/Pagination.vue";
 import {Head, Link, router} from '@inertiajs/vue3';
+import { ref, onMounted } from "vue";
+import TextInput from "@/Components/TextInput.vue";
+
 import {useSortingStore} from "@/stores/sorting";
 const props = defineProps({
     users: {
@@ -10,11 +13,23 @@ const props = defineProps({
     }
 })
 // sorting
+var searchValue = ref('');
+
 const store = useSortingStore();
 const sort = (column) => {
   store.sortValues(column);
-  router.visit(`?column=${store.column}&type=${store.type}`);
+  router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 };
+// Search
+const search = () => {
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+}
+const clearSearch = () => {
+    router.visit(`?q=`);
+}
+onMounted(() => {
+    searchValue.value = new URLSearchParams(window.location.search).get('q');
+});
 </script>
 
 <template>
@@ -39,7 +54,20 @@ const sort = (column) => {
                 </div>
             </div>
 
+            <div class="flex items-end gap-3 ">
+                <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
+                    v-on:keyup.enter="search" />
 
+                <button @click="search" type="button"
+                    class="mb-8 flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Search
+                </button>
+
+                <button v-if="searchValue" @click="clearSearch" type="button"
+                    class="mb-8 flex items-center text-blue-700 bg-white border border-blue-700 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Clear
+                </button>
+            </div>
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
