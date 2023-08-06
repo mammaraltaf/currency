@@ -52,7 +52,7 @@ const countryEdited = (country) => {
 // Search
 let searchValue = ref('');
 const search = () => {
-    router.visit(`?q=${searchValue.value}&column=${store.type}&type=${store.type}`);
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 }
 // sorting
 const store = useSortingStore();

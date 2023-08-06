@@ -21,14 +21,18 @@ class CurrencyController extends Controller
         $columnName = $request->get('column')!=null?$request->get('column'):'code';
         $columnType = $request->get('type')!=null?$request->get('type'):'asc';
         $fetched_at = Setting::first() ? Setting::first()->main['fetched_at'] : null;
-        // dd($columnName,$columnType);
         $query = Currency::with(['country:label,id,currency_id'])->orderBy($columnName,$columnType);
+
         if (request()->has('q') ) {
-            $query->where('code','LIKE', '%' . request('q') . '%');
+            $query->where('code','LIKE', '%' . request('q') . '%')
+            ->orWhere('name','LIKE', '%' . request('q') . '%')
+            ->orWhere('symbol','LIKE', '%' . request('q') . '%')
+                ->orWhereHas('country', function ($query) {
+                    $query->where('label', 'LIKE', '%' . request('q') . '%');
+                });
         }
         $currencies = $query->paginate(25);
 
-        // dd($currencies);
             return Inertia::render('Admin/Currencies/Index', [
             'currencies' => $currencies,
             'info' => [

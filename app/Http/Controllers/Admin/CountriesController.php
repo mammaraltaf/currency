@@ -15,26 +15,24 @@ class CountriesController extends Controller
 {
     public function countriesPage(Request $request): Response
     {
-        // $query = Country::query();
-        $sort = $request->get('column')!=null ? $request->get('column') : 'id';
-        $sortType = $request->get('type')!=null ? $request->get('type') : 'asc';
-        if ($sort != 'name') {
-            $query = Country::orderBy($sort, $sortType);
-        } else {
-            $query = Country::join('currencies', 'countries.currency_id', '=', 'currencies.id')
-                ->orderBy('currencies.name', $sortType)
-                ->select('countries.*');
-        }
-        if (request()->has('q') && !empty(request('q'))) {
-            $search = request('q');
-            $query->where(function ($innerQuery) use ($search) {
-                $innerQuery->where('label', 'like', '%' . $search . '%')
-                    ->orWhere('can_send', 'like', '%' . $search . '%')
-                    ->orWhere('can_receive', 'like', '%' . $search . '%');
-            });
+        $columnName = $request->get('column') != null ? $request->get('column') : 'label';
+        $columnType = $request->get('type') != null ? $request->get('type') : 'asc';
+
+        $query = Country::with('currency')->orderBy($columnName, $columnType);
+
+        if (request()->has('q')) {
+            $query->where('id', 'LIKE', '%' . request('q') . '%')
+                ->orWhere('label', 'LIKE', '%' . request('q') . '%')
+                ->orWhere('code', 'LIKE', '%' . request('q') . '%')
+                ->orWhere('can_send', 'LIKE', '%' . request('q') . '%')
+                ->orWhere('can_receive', 'LIKE', '%' . request('q') . '%')
+                ->orWhere('status', 'LIKE', '%' . request('q') . '%')
+                ->orWhereHas('currency', function ($query) {
+                    $query->where('name', 'LIKE', '%' . request('q') . '%');
+                });
         }
 
-        $countries = $query->paginate(30);
+        $countries = $query->paginate(25);
 
         return Inertia::render('Admin/Countries/Index', [
             'countries' => $countries,
