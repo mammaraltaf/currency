@@ -5,6 +5,8 @@ export const useSortingStore = defineStore('sorting', {
   state: () => ({
     column: 'id',
     type: 'asc',
+    searchValue: '',
+    disableClick: 'false',
   }),
   actions: {
     sortValues(column) {

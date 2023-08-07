@@ -16,12 +16,17 @@ const props = defineProps({
 
 // sorting
 let searchValue = ref('');
+var disableClick = ref(false)
 
 const store = useSortingStore();
 const sort = (column) => {
+    searchValue.value = searchValue.value != null ? searchValue.value : ""
+    disableClick.value = true
     store.sortValues(column);
-    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-};
+    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+if (res) {
+        disableClick.value = false
+    }};
 // Search
 const search = () => {
     router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
@@ -74,27 +79,37 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sort('created_at')">
-                                Initialized
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('created_at')">
+                                Initialized <span class="fw-100">{{ store.column == 'created_at' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('user')">
-                                Sender
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('user')">
+                                Sender <span class="fw-100">{{ store.column == 'user' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('receiver')">
-                                Receiver
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('receiver')">
+                                Receiver <span class="fw-100">{{ store.column == 'receiver' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('amount')">
-                                Amount
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('amount')">
+                                Amount <span class="fw-100">{{ store.column == 'amount' ? '(' + store.type + ')' : '' }}</span>
                             </th>
 
-                            <th class="px-6 py-3" scope="col" @click="sort('status')">
-                                status
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('status')">
+                                status <span class="fw-100">{{ store.column == 'status' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('type')">
-                                type
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('type')">
+                                type <span class="fw-100">{{ store.column == 'type' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('payment_status')">
-                                Payment Status
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('payment_status')">
+                                Payment Status <span class="fw-100">{{ store.column == 'payment_status' ? '(' + store.type + ')'
+                                    : '' }}</span>
                             </th>
                         </tr>
                     </thead>
@@ -157,7 +172,21 @@ export default {
 </script>
 
 <style scoped>
-th:not(:last-child) {
+.clickable {
     cursor: pointer;
 }
-</style>
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    /* You can adjust the opacity as needed */
+    pointer-events: none;
+}
+
+th span {
+    font-size: 9px;
+}
+
+th:not(:last-child) {
+    cursor: pointer;
+}</style>

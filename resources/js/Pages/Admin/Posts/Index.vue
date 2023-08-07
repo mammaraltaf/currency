@@ -109,13 +109,17 @@ const updatePostRates = async () => {
     }
 }
 // sorting
+var searchValue = ref('');
+var disableClick = ref(false)
 const store = useSortingStore();
-let searchValue = ref('');
-
 const sort = (column) => {
+    searchValue.value = searchValue.value != null ? searchValue.value : ""
+    disableClick.value = true
     store.sortValues(column);
-    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-};
+    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+if (res) {
+        disableClick.value = false
+    }};
 // Search
 const search = () => {
     router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
@@ -172,25 +176,25 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sort('created_at')">
-                                Initialized
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('created_at')">
+                                Initialized <span class="fw-100">{{ store.column == 'created_at' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('status')">
-                                Status
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('status')">
+                                Status <span class="fw-100">{{ store.column == 'status' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('user')">
-                                Country from
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('user')">
+                                Country from <span class="fw-100">{{ store.column == 'user' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('receiver')">
-                                Country To
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('receiver')">
+                                Country To <span class="fw-100">{{ store.column == 'receiver' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('amount')">
-                                Amount
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('amount')">
+                                Amount <span class="fw-100">{{ store.column == 'amount' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('id')">
-                                Direct Transaction Reference
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('id')">
+                                Direct Transaction Reference <span class="fw-100">{{ store.column == 'id' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col">
+                            <th class="px-6 py-3"   scope="col">
                                 Actions
                             </th>
                         </tr>
@@ -276,5 +280,18 @@ export default {
 <style scoped>
 th:not(:last-child) {
     cursor: pointer;
+}
+.clickable {
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    /* You can adjust the opacity as needed */
+    pointer-events: none;
+}
+th span{
+    font-size: 9px;
 }
 </style>

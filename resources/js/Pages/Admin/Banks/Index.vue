@@ -79,11 +79,16 @@ const search = () => {
 }
 
 // sorting
+var disableClick = ref(false)
 const store = useSortingStore();
 const sort = (column) => {
+    searchValue.value = searchValue.value != null ? searchValue.value : ""
+    disableClick.value = true
     store.sortValues(column);
-    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-};
+    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+if (res) {
+        disableClick.value = false
+    }};
 const clearSearch = () => {
     router.visit(`?q=`);
 }
@@ -136,14 +141,14 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sort('id')">
-                                #ID
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col" @click="sort('id')">
+                                #ID <span class="fw-100">{{ store.column == 'id' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('label')">
-                                Bank Name
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col" @click="sort('label')">
+                                Bank Name <span class="fw-100">{{ store.column == 'label' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('country')">
-                                Country
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col" @click="sort('country')">
+                                Country <span class="fw-100">{{ store.column == 'country' ? '('+store.type+')' : '' }}</span>
                             </th>
                             <th class="px-6 py-3" scope="col">
                                 Actions
@@ -192,7 +197,17 @@ export default {
 }
 </script>
 <style scoped>
-th:not(:last-child) {
+.clickable {
     cursor: pointer;
+}
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    /* You can adjust the opacity as needed */
+    pointer-events: none;
+}
+th span{
+    font-size: 9px;
 }
 </style>

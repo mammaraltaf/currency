@@ -11,6 +11,7 @@ import DeleteIcon from "@/Icons/DeleteIcon.vue";
 import EditIcon from "@/Icons/EditIcon.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useAPI } from "@/Composables/useAPI";
+import { useSortingStore } from "@/stores/sorting";
 import { useNotificationStore } from "@/stores/notification";
 import SaveIcon from "@/Icons/SaveIcon.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -119,30 +120,25 @@ const updateCurrencyRates = async () => {
 // Search
 let searchValue = ref('');
 const search = () => {
-    router.visit(`?q=${searchValue.value}&column=${sortColumn.value}&type=${sortType.value}`);
+    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 }
 // sorting
-// let sortFlag = ref(1)
-let sortColumn = ref('code')
-let sortType = ref('asc')
-let sortValues = (column) => {
-    sortColumn.value = column;
-    if (sortColumn.value === column) {
-        sortType.value = sortType.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortType.value = 'asc';
-    }
+var disableClick = ref(false)
+const store = useSortingStore();
+const sort = (column) => {
     searchValue.value = searchValue.value != null ? searchValue.value : ""
-    router.visit(`?q=${searchValue.value}&column=${sortColumn.value}&type=${sortType.value}`);
-}
+    disableClick.value = true
+    store.sortValues(column);
+    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+if (res) {
+        disableClick.value = false
+    }};
 const clearSearch = () => {
     router.visit(`?q=`);
 }
 
 onMounted(() => {
     searchValue.value = new URLSearchParams(window.location.search).get('q');
-    sortColumn.value = new URLSearchParams(window.location.search).get('column');
-    sortType.value = new URLSearchParams(window.location.search).get('type');
 });
 function setStatus(currency) {
     // if (condition) {
@@ -216,25 +212,32 @@ function setStatus(currency) {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3 cursor-pointer" scope="col" @click="sortValues('name')">
-                                Country
+                            <th class="px-6 py-3 cursor-pointer" :class="disableClick ? 'disabled' : 'clickable'"
+                                scope="col" @click="sort('name')">
+                                Country <span class="fw-100">{{ store.column == 'name' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3 cursor-pointer" scope="col" @click="sortValues('code')">
-                                Currency Code
+                            <th class="px-6 py-3 cursor-pointer" :class="disableClick ? 'disabled' : 'clickable'"
+                                scope="col" @click="sort('code')">
+                                Currency Code <span class="fw-100">{{ store.column == 'code' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3 cursor-pointer" scope="col" @click="sortValues('name')">
-                                Currency name
+                            <th class="px-6 py-3 cursor-pointer" :class="disableClick ? 'disabled' : 'clickable'"
+                                scope="col" @click="sort('name')">
+                                Currency name <span class="fw-100">{{ store.column == 'name' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
 
 
                             <th class="px-6 py-3" scope="col">
-                                Switch
+                                Switch <span class="fw-100">{{ store.column == 'role' ? '(' + store.type + ')' : '' }}</span>
                             </th>
                             <th class="px-6 py-3" scope="col">
-                                Rate
+                                Rate <span class="fw-100">{{ store.column == 'role' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3 cursor-pointer" scope="col" @click="sortValues('rate_source')">
-                                Rate source (WB/Special)
+                            <th class="px-6 py-3 cursor-pointer" :class="disableClick ? 'disabled' : 'clickable'"
+                                scope="col" @click="sort('rate_source')">
+                                Rate source (WB/Special) <span class="fw-100">{{ store.column == 'rate_source' ?
+                                    '(' + store.type + ')' : '' }}</span>
                             </th>
                             <th class="px-6 py-3" scope="col">
                                 Actions
@@ -304,10 +307,6 @@ export default {
 }
 </script>
 <style scoped>
-.cursor-pointer {
-    cursor: pointer;
-}
-
 .slider {
     /* -webkit-appearance: none; */
     width: 40px;
@@ -345,4 +344,18 @@ export default {
 .slider-checked {
     background-color: #1C64F2;
 }
-</style>
+
+.clickable {
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    /* You can adjust the opacity as needed */
+    pointer-events: none;
+}
+
+th span {
+    font-size: 9px;
+}</style>

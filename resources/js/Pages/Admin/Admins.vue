@@ -16,12 +16,16 @@ const props = defineProps({
 })
 // sorting
 var searchValue = ref('');
-
+var disableClick = ref(false)
 const store = useSortingStore();
 const sort = (column) => {
+    searchValue.value = searchValue.value != null ? searchValue.value : ""
+    disableClick.value = true
     store.sortValues(column);
-    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-};
+    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+    if (res) {
+        disableClick.value = false
+    }};
 // Search
 const search = () => {
     router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
@@ -73,23 +77,29 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" scope="col" @click="sort('first_name')">
-                                Name
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('first_name')">
+                                Name <span class="fw-100">{{ store.column == 'first_name' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('email')">
-                                Email
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('email')">
+                                Email <span class="fw-100">{{ store.column == 'email' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('phone')">
-                                Phone
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('phone')">
+                                Phone <span class="fw-100">{{ store.column == 'phone' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('country')">
-                                Country Code
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('country')">
+                                Country Code <span class="fw-100">{{ store.column == 'country' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('ip_address')">
-                                IP Address
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('ip_address')">
+                                IP Address <span class="fw-100">{{ store.column == 'ip_address' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" scope="col" @click="sort('role')">
-                                Role
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('role')">
+                                Role <span class="fw-100">{{ store.column == 'role' ? '('+store.type+')' : '' }}</span>
                             </th>
                         </tr>
                     </thead>
@@ -132,7 +142,17 @@ export default {
 }
 </script>
 <style scoped>
-th.px-6.py-3 {
+.clickable {
     cursor: pointer;
+}
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    /* You can adjust the opacity as needed */
+    pointer-events: none;
+}
+th span{
+    font-size: 9px;
 }
 </style>
