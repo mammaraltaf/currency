@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Omnipay\Omnipay;
@@ -53,6 +55,9 @@ class MonerisPaymentController extends Controller
 //    }
 
 
+
+
+
     /*moneris payment*/
     public function payment(Request $request)
     {
@@ -96,6 +101,13 @@ class MonerisPaymentController extends Controller
             /*Check the response - success or fail*/
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
+                $user = User::getUserFromSession();
+                Post::create([
+                    'transaction_id' => $transactionId,
+                    'country_code' => $user['country'],
+                    'status' => Post::AVAILABLE,
+                ]);
+
                 Log::info('Payment successful. Transaction ID: ' . $transactionId);
                 return response()->json(['status' => 'success', 'transactionId' => $transactionId]);
             } else {
