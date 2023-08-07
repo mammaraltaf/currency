@@ -97,8 +97,8 @@ onMounted(() => {
                                 @click="sort('ip_address')">
                                 IP Address <span class="fw-100">{{ store.column == 'ip_address' ? '('+store.type+')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
-                                @click="sort('role')">
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col">
+<!--                                @click="sort('role')"-->
                                 Role <span class="fw-100">{{ store.column == 'role' ? '('+store.type+')' : '' }}</span>
                             </th>
                         </tr>

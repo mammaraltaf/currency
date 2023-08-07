@@ -60,6 +60,13 @@ class PostController extends Controller
         return $response;
     }
 
+    public function refresh($id)
+    {
+        $post = Post::find($id);
+        $post->makeAvailable();
+        return response()->json(['message' => 'Post refreshed successfully']);
+    }
+
     public function delete(DeletePostRequest $request, Post $post): array | bool
     {
         if ($post->delete()) {

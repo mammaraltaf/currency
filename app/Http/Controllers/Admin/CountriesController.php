@@ -15,10 +15,18 @@ class CountriesController extends Controller
 {
     public function countriesPage(Request $request): Response
     {
-        $columnName = $request->get('column') != null ? $request->get('column') : 'label';
-        $columnType = $request->get('type') != null ? $request->get('type') : 'asc';
+        $columnName = $request->get('column')!=null?$request->get('column'):'label';
+        $columnType = $request->get('type')!=null?$request->get('type'):'ASC';
 
-        $query = Country::with('currency')->orderBy($columnName, $columnType);
+        if ($columnName === 'name') {
+            $query = Country::with(['currency' => function ($query) use ($columnType) {
+                $query->orderBy('name', $columnType);
+            }]);
+        }
+
+        else{
+            $query = Country::with('currency')->orderBy($columnName, $columnType);
+        }
 
         if (request()->has('q')) {
             $query->where('id', 'LIKE', '%' . request('q') . '%')
@@ -28,6 +36,7 @@ class CountriesController extends Controller
                 ->orWhere('can_receive', 'LIKE', '%' . request('q') . '%')
                 ->orWhere('status', 'LIKE', '%' . request('q') . '%')
                 ->orWhereHas('currency', function ($query) {
+                    $query->where('code', 'LIKE', '%' . request('q') . '%');
                     $query->where('name', 'LIKE', '%' . request('q') . '%');
                 });
         }

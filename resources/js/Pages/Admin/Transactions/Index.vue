@@ -84,17 +84,17 @@ onMounted(() => {
                                 Initialized <span class="fw-100">{{ store.column == 'created_at' ? '(' + store.type + ')' : ''
                                 }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
-                                @click="sort('user')">
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col">
+<!--                                @click="sort('user')"-->
                                 Sender <span class="fw-100">{{ store.column == 'user' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
-                                @click="sort('receiver')">
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col">
+<!--                                @click="sort('receiver')"-->
                                 Receiver <span class="fw-100">{{ store.column == 'receiver' ? '(' + store.type + ')' : ''
                                 }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
-                                @click="sort('amount')">
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col">
+<!--                                @click="sort('amount')">-->
                                 Amount <span class="fw-100">{{ store.column == 'amount' ? '(' + store.type + ')' : '' }}</span>
                             </th>
 
