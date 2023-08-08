@@ -70,7 +70,7 @@ class PostController extends Controller
             }
 
             DB::beginTransaction();
-            /*Get FiftyFifty Random User*/
+            /*Store Payment Intent Data*/
             $paymentIntentData = [
                 'stripe_payment_intent_id' => $request->input('stripe_payment_intent_id', rand(100000, 999999)),
                 'amount' => $request->input('amount', 0),
@@ -80,7 +80,8 @@ class PostController extends Controller
 
             $paymentIntent = $fiftyUserEmails->paymentIntents()->create($paymentIntentData);
 
-            Transaction::create([
+            /*Store Transaction Data*/
+            $transaction = Transaction::create([
                 'user_id' => $fiftyUserEmails->id,
                 'receiver_id' => $request->input('receiver_id', 1),
                 'payment_intent_id' => $paymentIntent->id,
@@ -88,8 +89,6 @@ class PostController extends Controller
                 'status' => Transaction::PAIRING_PENDING,
                 'payment_status' => Transaction::PAYMENT_ON_HOLD
             ]);
-
-            $transaction = $fiftyUserEmails->transactions()->first();
 
             $response = Post::create([
                 'transaction_id' => $transaction->id,
