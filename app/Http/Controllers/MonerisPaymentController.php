@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentIntent;
 use App\Models\Post;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Omnipay\Omnipay;
 
@@ -101,11 +105,67 @@ class MonerisPaymentController extends Controller
             /*Check the response - success or fail*/
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
-//                $user = User::getUserFromSession();
-//                dd($user,$response);
+                $sessionData = User::getUserFromSession();
 
-                Log::info('Payment successful. Transaction ID: ' . $transactionId);
-                return response()->json(['status' => 'success', 'transactionId' => $transactionId]);
+                DB::beginTransaction();
+
+                // Create or update user
+                $user = User::updateOrCreate(
+                    ['email' => $sessionData['email']],
+                    [
+                        'first_name' => $sessionData['first_name'],
+                        'last_name' => $sessionData['last_name'],
+                        'country' => $sessionData['country'],
+                        'password' => Hash::make('password'),
+                    ]
+                );
+
+                // Generate random stripe payment intent ID
+                $stripePaymentIntentId = rand(100000, 999999);
+
+                // Store Payment Intent Data
+                $paymentIntentData = [
+                    'user_id' => $user->id,
+                    'stripe_payment_intent_id' => $stripePaymentIntentId,
+                    'amount' => $sessionData['amount'],
+                    'currency' => $sessionData['currency'],
+                    'status' => Post::AVAILABLE,
+                ];
+
+                // Create Payment Intent and associate with user
+                $paymentIntent = $user->paymentIntents()->create($paymentIntentData);
+
+                // Store Transaction Data
+                $transactionData = [
+                    'receiver_id' => 1,
+                    'payment_intent_id' => $paymentIntent->id,
+                    'type' => 'direct',
+                    'status' => Transaction::PAIRING_PENDING,
+                    'payment_status' => Transaction::PAYMENT_ON_HOLD,
+                ];
+
+                // Create Transaction and associate with user
+                $transaction = $user->transactions()->create($transactionData);
+
+                // Store Post data
+                $postData = [
+                    'transaction_id' => $transaction->id,
+                    'country_code' => $sessionData['country'],
+                    'status' => Post::AVAILABLE,
+                ];
+
+                // Create Post
+                $post = Post::create($postData);
+
+                $data = [
+                    'payment_intent_id' => $stripePaymentIntentId,
+                    'country' => $sessionData['country'],
+                    'transactionId' => $transactionId,
+                ];
+
+                DB::commit();
+
+                return response()->json(['status' => 'success', 'data' => $data]);
             } else {
                 /*Payment failed*/
                 $errorMessage = $response->getMessage();
