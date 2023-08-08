@@ -31,7 +31,7 @@ const props = defineProps({
         type: Object
     },
 })
-
+let currentStep =ref('verify-contacts')
 const emailVerified = ref(!!props.user.email_verified_at);
 
 const notificationStore = useNotificationStore();
@@ -48,6 +48,7 @@ const continueToPayment = async () => {
 
 const verifyUser = () => {
     emailVerified.value = true;
+    currentStep.value = "card-info";
     openCardInfo()
 
     continueToPayment();
@@ -69,7 +70,7 @@ const verifyUser = () => {
         <div class="transaction-step-wrapper">
             <div class="transaction-step">
 
-                <TransactionSteps />
+                <TransactionSteps :currentStep="currentStep" />
 
                 <FiftyText variation="heading-3" class="mb-2">
                     Email / Phone Verification
