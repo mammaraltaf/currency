@@ -26,6 +26,11 @@ class Role extends Model
         return Role::where('name', 'manager')->first();
     }
 
+    public static function fiftyUser()
+    {
+        return Role::where('name', 'fifty.user')->first();
+    }
+
     public function allowTo($abilities): Model|array|Collection
     {
 

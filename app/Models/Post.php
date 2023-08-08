@@ -18,6 +18,17 @@ class Post extends Model
     const ON_HOLD = 'on_hold';
     const COMPLETED = 'completed';
 
+    public static function STATUSES(): array
+    {
+        return [
+            self::AVAILABLE,
+            self::CANCELLED,
+            self::ON_HOLD,
+            self::COMPLETED,
+        ];
+    }
+
+
     protected $guarded = [];
 
     public static function createTransactionPost($transaction)

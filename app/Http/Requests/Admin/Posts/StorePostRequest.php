@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\Posts;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
@@ -24,10 +25,11 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transaction_id' => ['required', 'numeric'],
-            'country_code' => ['required', 'min:2', 'max:199', 'string'],
-            // 'status' => ['required', 'min:3', 'max:199', 'string'],
-            'status' => ['required','boolean'],
+            'amount' => ['required', 'numeric'],
+            'currency' => ['required', 'string','exists:currencies,code'],
+            'status' => ['required', 'string', 'in:' . implode(',', Post::STATUSES())],
+            'receiver_id' => ['required', 'numeric', 'exists:receivers,id'],
+            'country_code' => ['required', 'string', 'exists:countries,code'],
         ];
     }
 }
