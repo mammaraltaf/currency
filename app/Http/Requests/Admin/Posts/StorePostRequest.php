@@ -29,7 +29,7 @@ class StorePostRequest extends FormRequest
             'currency' => ['required', 'string','exists:currencies,code'],
             'status' => ['required', 'string', 'in:' . implode(',', Post::STATUSES())],
             'receiver_id' => ['required', 'numeric', 'exists:receivers,id'],
-            'country_code' => ['required', 'string', 'exists:countries,code'],
+            'country_code' => ['required', 'string', 'exists:countries,code_iso_2'],
         ];
     }
 }

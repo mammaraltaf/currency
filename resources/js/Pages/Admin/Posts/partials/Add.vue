@@ -6,27 +6,32 @@ import ToggleSwitch from "@/Components/Custom/ToggleSwitch.vue";
 import SelectInput from "@/Components/Custom/SelectInput.vue";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import { countries } from "@/helpers/countries";
+import { currencies } from "@/helpers/currencies";
+import { postStatus } from "@/helpers/postStatus";
+import TextInput from "@/Components/TextInput.vue";
+
 console.log('countires', countries);
 const api = useAPI();
 const notification = useNotificationStore();
 
 const props = defineProps({
 
-    transactions: {
+    receivers: {
         required: true,
         type: Object
     }
 });
+console.log('receivers', props.receivers);
 let allCountries = computed(() => {
     return countries.map((country) => ({
         label: country.value + "(" + country.label + ")",
         value: country.value
     }));
 });
-let allTransactions = computed(() => {
-    return props.transactions.map((transaction) => ({
-        label: transaction.user.first_name + ' ' + transaction.user.last_name + "(Sender)",
-        value: transaction.id
+let allreceivers = computed(() => {
+    return props.receivers.map((receiver) => ({
+        label: receiver.first_name + ' ' + receiver.last_name,
+        value: receiver.id
     }));
 });
 // Emits
@@ -46,25 +51,28 @@ const endAdd = () => {
 }
 
 const post = reactive({
-    'transaction_id': '',
+    'receiver_id': '',
     'country_code': '',
-    'status': false,
+    'amount': '',
+    'currency': '',
+    'status': '',
 })
 
 
 const resetPost = () => {
-    post.transaction_id = ''
+    post.receiver_id = ''
     post.country_code = ''
+    post.amount = ''
+    post.currency = ''
     post.status = ''
 }
 
 const addPost = async () => {
     api.startRequest();
-
     try {
         const res = await axios.post('/admin/posts/store', post)
-
-        if (res.data.id || res.data.status === 'success') {
+        console.log('res',res);
+        if ( res.status === 200) {
             notification.notify('Post added', 'success');
             endAdd();
             emit('postAdded', res.data);
@@ -90,22 +98,28 @@ const addPost = async () => {
         <form v-show="formOpened" class="border-gray-400 border rounded-lg p-6 mb-8">
             <div class="grid gap-6 mb-10 md:grid-cols-2">
                 <!-- <TextInput
-                    v-model="post.transaction_id"
-                    :errors="api.errors.value?.transaction_id"
+                    v-model="post.receiver_id"
+                    :errors="api.errors.value?.receiver_id"
                     label="Post Transection Id"
                     placeholder="Transection ID"
                     required
-                    title="transaction"
+                    title="receiver"
                 /> -->
-                <SelectInput v-model="post.transaction_id" :errors="api.errors.value?.transaction_id"
-                    :options="allTransactions" label="Transactions" required placeholder=" Select " title="Transaction"
-                    type="text" />
+                <TextInput v-model="post.amount" :errors="api.errors.value?.amount"
+                    label="Amount" placeholder="Amount" required title="amount" class="fifty-form-input" type="number" />
+                <SelectInput v-model="post.receiver_id" :errors="api.errors.value?.receiver_id" :options="allreceivers"
+                    label="receivers" required placeholder=" Select " title="receiver" type="text" />
+                <SelectInput v-model="post.currency" :errors="api.errors.value?.currency" :options="currencies"
+                    label="Currency" required placeholder=" Select " title="Currency" type="text" />
                 <SelectInput v-model="post.country_code" :errors="api.errors.value?.country_code" :options="allCountries"
                     label="Country Code" required placeholder=" Select " title="Country Code" type="text" />
-                <div>
-                    <label>Status</label>
+                    <SelectInput v-model="post.status" :errors="api.errors.value?.status" :options="postStatus"
+                    label="Status" required placeholder=" Select " title="Status" type="text" />
+
+                    <div>
+                    <!-- <label>Status</label>
                     <input type="checkbox" :class="post.status ? 'slider-checked' : ''" class="slider"
-                        v-model="post.status" />
+                        v-model="post.status" /> -->
                 </div>
 
             </div>

@@ -8,7 +8,8 @@ import { Head, Link, router } from "@inertiajs/vue3";
 import { useSortingStore } from "@/stores/sorting";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import DeleteIcon from "@/Icons/DeleteIcon.vue";
-import EditIcon from "@/Icons/EditIcon.vue";
+import TransactionsIcon from "@/Icons/TransactionsIcon.vue";
+
 import { ref, reactive, onMounted } from "vue";
 import { useAPI } from "@/Composables/useAPI";
 import { useNotificationStore } from "@/stores/notification";
@@ -22,17 +23,18 @@ const props = defineProps({
         required: true,
         type: Object
     },
-    transactions: {
+    receivers: {
         required: true,
         type: Object
     }
 
 })
-console.log('posts', props.posts);
+console.log('receivers', props.receivers);
 // Adding
 const postAdded = (data) => {
-    console.log('daya', data);
-    props.posts.data.push(data);
+    console.log('data after adding ', data);
+    // props.posts.data.push(data.data);
+    props.posts.data.unshift(data.data)
     props.posts.total++;
 
 }
@@ -58,13 +60,42 @@ function closeEditDialog($isFetchData) {
 
     return { showEditDialog };
 }
+// refreshing
+
+let refreshPostId = ref();
+const refreshPost = async (post) => {
+    console.log(post);
+    refreshPostId.value = post.id;
+    index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === post.id);
+    console.log('index.value',index.value);
+    api.startRequest();
+
+    try {
+        const res = await axios.delete('/admin/posts/refresh/' + post.id)
+        console.log('res refresh',res);
+
+        if (res.data.id || res.data.status === 'success') {
+            notification.notify('Post deleted', 'success');
+            post.id = 'deleted';
+            props.posts.total--;
+            props.posts.rows.splice(index.value, 1);
+            index.value = null
+        }
+    } catch (errors) {
+        notification.notify('Error, this base post can not be deleted.', 'error');
+        api.handleErrors(errors)
+    } finally {
+        api.requestCompleted();
+    }
+}
 // Deleting
+
 let deletingPostId = ref();
 const deletePost = async (post) => {
     console.log(post);
     deletingPostId.value = post.id;
     index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === post.id);
-
+    console.log('index.value',index.value);
     api.startRequest();
 
     try {
@@ -135,10 +166,11 @@ onMounted(() => {
     let cpg = new URLSearchParams(window.location.search).get('page');
     currentPage.value = cpg!=null?cpg:1
 });
+
 </script>
 
 <template>
-    <Edit :show="showEditDialog" :transactions="props.transactions" :postData="editingPost" v-if="showEditDialog"
+    <Edit :show="showEditDialog" :receivers="props.receivers" :postData="editingPost" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
     <Head title="Posts">
@@ -161,7 +193,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <Add :transactions="props.transactions" @postAdded="postAdded" />
+            <Add :receivers="props.receivers" @postAdded="postAdded" />
             <div class="flex items-end gap-3 ">
                 <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
                     v-on:keyup.enter="search" />
@@ -257,8 +289,8 @@ onMounted(() => {
                                 <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
                                     class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
 
-                                <!-- <EditIcon @click="edit(post)"
-                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" /> -->
+                                <TransactionsIcon @click="refreshPost(post)"
+                                    class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
 
                                 <Spinner v-if="api.isLoading.value && deletingPostId.value === post.id"
                                     class="button-spinner-center action-btn" />

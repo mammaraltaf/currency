@@ -12,7 +12,7 @@ const props = defineProps({
 const steps = {
     'sender-info': 1,
     'verify-contacts': 2,
-    // 'receiver-info': 3,
+    'receiver-info': 4,
     'card-info': 3,
 };
 
@@ -37,15 +37,16 @@ const completedSteps = computed( () => {
                     {{ currentStep.replace('-', ' ')}}
                 </div>
             </li>
-            <!-- <li :class="{'current': currentStep === 'receiver-info', 'completed': completedSteps > 3}">
-                <span class="step-icon"></span>
-                <div class="step-text">
-                    {{ currentStep.replace('-', ' ')}}
-                </div>
-            </li> -->
-            <li :class="{'current': currentStep === 'card-info'}">
+
+            <li :class="{'current': currentStep === 'card-info', 'completed': completedSteps > 3}">
                 <span class="step-icon"></span>
                 <div class="step-text last">
+                    {{ currentStep.replace('-', ' ')}}
+                </div>
+            </li>
+            <li :class="{'current': currentStep === 'receiver-info', 'completed': completedSteps > 4}">
+                <span class="step-icon"></span>
+                <div class="step-text">
                     {{ currentStep.replace('-', ' ')}}
                 </div>
             </li>

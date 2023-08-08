@@ -20,7 +20,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    transactions:{
+    receivers:{
         required: true,
         type: Object
     },
@@ -37,8 +37,8 @@ let allCountries = computed(() => {
     value: country.value
   }));
 });
-let allTransactions = computed(() => {
-    return props.transactions.map((transaction) => ({
+let allreceivers = computed(() => {
+    return props.receivers.map((transaction) => ({
     label: transaction.user.first_name+' '+transaction.user.last_name+"(Sender)",
     value: transaction.id
   }));
@@ -102,9 +102,9 @@ const endEdit = () => {
                         <SelectInput
                     v-model="postData.value.transaction_id"
                     :errors="api.errors.value?.transaction_id"
-                    :options="allTransactions"
+                    :options="allreceivers"
                     :selected="postData.value.transaction_id"
-                    label="Transactions"
+                    label="receivers"
                     required
                     placeholder=" Select "
                     title="Transaction"

@@ -18,7 +18,7 @@ const props = defineProps({
 
 <script>
 export default {
-    name: 'ArrowLeft'
+    name: 'ArrowRight'
 }
 </script>
 

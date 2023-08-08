@@ -14,6 +14,7 @@ use App\Http\Requests\Admin\Posts\DeletePostRequest;
 use Inertia\Response;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Receiver;
 
 
 class PostController extends Controller
@@ -49,10 +50,10 @@ class PostController extends Controller
         }
 
         $posts = $query->paginate(10);
-        $transactions = Transaction::with('user:first_name,id,last_name')->select('id','user_id','receiver_id')->get();
+        $receivers = Receiver::all();
         return Inertia::render('Admin/Posts/Index', [
             'posts' => $posts,
-            'transactions' => $transactions,
+            'receivers' => $receivers,
         ]);
         ##update it according to the condition just added to check if the crud working
     }
@@ -95,6 +96,7 @@ class PostController extends Controller
                 'country_code'=> $request->input('country_code', 'US'),
                 'status' => Post::AVAILABLE,
             ]);
+            $response->load('transaction.user','transaction.receiver');
 
             DB::commit();
 
