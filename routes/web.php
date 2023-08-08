@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
 
 // User data (authentication of user) - public routes
 Route::get('/user-info', [UsersController::class, 'userInfoPage'])->name('user.info.page');
-Route::post('/verify-contacts', [VerificationController::class, 'verifyUserPage'])->name('verify.user.page');
+Route::get('/verify-contacts', [VerificationController::class, 'verifyUserPage'])->name('verify.user.page');
 
 
 Route::middleware('auth')->group(function () {

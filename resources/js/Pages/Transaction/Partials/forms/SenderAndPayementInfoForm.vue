@@ -46,23 +46,21 @@ const user = reactive({
     'last_name': '',
     'email': '',
     'phone': '',
-})
-const validationError = ref('');
-const transactionInfo = reactive({
     'amount': '100',
     'currency': currencies_countries[geoLocationDetails.country_code],
     'country': '',
-});
+})
+const validationError = ref('');
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
 
     const selectedCountry = props.receivingCountries.find((country) => {
-        return country.code_iso_2 === transactionInfo.country || country.code === transactionInfo.country
+        return country.code_iso_2 === user.country || country.code === user.country
     });
 
     try {
         const res = await axios.post('/api/convert-currency', {
-            'baseCurrency': transactionInfo.currency,
+            'baseCurrency': user.currency,
             'requiredCurrency': selectedCountry.currency.code
         });
 
@@ -77,14 +75,11 @@ const convertCurrencyByCountryCode = async () => {
 const verifyUserInformation = async (e) => {
     e.preventDefault();
     api.startRequest();
-    if (!transactionInfo.amount || !transactionInfo.currency || !transactionInfo.country || !user.country) {
-        validationError.value = 'Please fill in all the required fields.';
-        return;
-    }
+
 
     try {
         const res = await axios.post('/api/validate-info', { ...user, transactionId: props.transactionId });
-        if (res.data.status === 'success') router.post('/verify-contacts?source=' + (props.transactionId ?? 'direct'),{...transactionInfo});
+        if (res.data.status === 'success') router.get('/verify-contacts?source=' + (props.transactionId ?? 'direct'));
     } catch (errors) {
         notification.notify('Something went wrong...', 'error');
         api.handleErrors(errors)
@@ -93,7 +88,7 @@ const verifyUserInformation = async (e) => {
     }
 };
 const receiverGetsAmount = computed(() => {
-    return parseFloat((currentRate.value * transactionInfo.amount).toFixed(2))
+    return parseFloat((currentRate.value * user.amount).toFixed(2))
 });
 const phoneCountryChanged = (countryObject) => {
     user.phone = '+' + countryObject.dialCode;
@@ -139,28 +134,28 @@ const cancel = () => {
             Enter Receiver Information
         </FiftyText>
 
-        <NewTextInput v-model="transactionInfo.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
+        <NewTextInput v-model="user.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
             label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number" />
 
-        <NewSelectInput v-model="transactionInfo.currency" :disabled="isTransactionPreset"
+        <NewSelectInput v-model="user.currency" :disabled="isTransactionPreset"
             :errors="api.errors.value?.currency" :options="currencies" label="Currency"
             placeholder="Currency of your payment card" required title="country" class="fifty-form-input" type="text"
             @update:modelValue="convertCurrencyByCountryCode" />
 
-        <NewSelectInput v-model="transactionInfo.country" :disabled="isTransactionPreset"
+        <NewSelectInput v-model="user.country" :disabled="isTransactionPreset"
             :errors="api.errors.value?.country" :options="receivingCountries" label="Receiver Country"
             label-accessor="label" placeholder="Country" required title="country" class="fifty-form-input country"
             type="text" value-accessor="code_iso_2" @update:modelValue="convertCurrencyByCountryCode" />
 
         <transition mode="out-in" name="fade">
-            <div v-if="currentRate && transactionInfo.amount" class="receiver-gets-wrapper m-auto">
+            <div v-if="currentRate && user.amount" class="receiver-gets-wrapper m-auto">
                 <div class="receiver-gets">
                     <FiftyText class="title">
                         The receiver will get approximately
                     </FiftyText>
                     <Spinner v-if="isLoadingCurrencyRate" />
                     <div class="amount" v-else>
-                        {{ receiverGetsAmount }} {{ currencies_countries[transactionInfo.country] }}
+                        {{ receiverGetsAmount }} {{ currencies_countries[user.country] }}
                     </div>
                 </div>
             </div>

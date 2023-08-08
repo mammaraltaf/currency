@@ -15,10 +15,10 @@ const notification = useNotificationStore();
 const geoLocationDetails = usePage().props.geoDetails;
 // Props:
 const props = defineProps({
-    transactionInfo: {
-        type: Object,
-        required: true
-    },
+    // user: {
+    //     type: Object,
+    //     required: true
+    // },
     user: {
         type: Object,
         required: true
@@ -71,22 +71,22 @@ watch(expiryYear, (newYear) => {
 
     }
     expiryMonths.value = months
-    transactionInfo.expiry_year = newYear;
+    user.expiry_year = newYear;
 
 });
 
-const transactionInfo = reactive({
+const user = reactive({
     'amount': '',
     'currency': currencies_countries[geoLocationDetails.country_code],
     'card_number': '',
     'expiry_year': expiryYear.value,
     'expiry_month': '',
-    'cvv': '1111',
+    'cvv': '',
     'country': '',
 });
 onMounted(() => {
-    transactionInfo.amount = props.transactionInfo.amount;
-    transactionInfo.country = props.transactionInfo.country
+    user.amount = props.user.amount;
+    user.country = props.user.country
 })
 const isModalOpened = ref(props.show);
 console.log('modal here', isModalOpened.value);
@@ -114,10 +114,10 @@ const cardInfoSubmit = async () => {
     api.startRequest();
 
     try {
-        console.log('transactionInfo', transactionInfo);
-        const res = await axios.post('/moneris', transactionInfo);
+        console.log('user', user);
+        const res = await axios.post('/moneris', user);
         if (res.data.status === 'success') {
-            goForward('/receiver-info?payment-reference-identification=' + res.data.paymentIntent.id + '&country=' + transactionInfo.country);
+            goForward('/receiver-info?payment-reference-identification=' + res.data.paymentIntent.id + '&country=' + user.country);
             notification.notify('Success', 'success');
             close(true);
 
@@ -146,16 +146,16 @@ const endEdit = () => {
         <Modal :close="close" :isOpen="isModalOpened" header="Card Inforamtion">
             <template #content>
                 <div class="d-lg-flex d-md-flex d-sm-block">
-                    <NewTextInput v-model="transactionInfo.card_number" :errors="api.errors.value?.card_number"
+                    <NewTextInput v-model="user.card_number" :errors="api.errors.value?.card_number"
                     label="Card Number" placeholder="Card Number" required title="amount" class="fifty-form-input" type="number" />
                 <NewSelectInput v-model="expiryYear" :errors="api.errors.value?.expiry_year" :options="expiryYears"
                     label="Expiry Year" placeholder="Expiry Year of your payment card" required title="country"
                     class="fifty-form-input" type="text" />
                 </div>
-                <NewSelectInput v-model="transactionInfo.expiry_month" :errors="api.errors.value?.expiryMonth"
+                <NewSelectInput v-model="user.expiry_month" :errors="api.errors.value?.expiryMonth"
                     :options="expiryMonths" label="Expiry Month" placeholder="Expiry Month of your payment card" required
                     title="expiry month" class="fifty-form-input" type="text" />
-                <NewTextInput v-model="transactionInfo.cvv" :errors="api.errors.value?.cvv" label="cvv" placeholder="99"
+                <NewTextInput v-model="user.cvv" :errors="api.errors.value?.cvv" label="cvv" placeholder="cvv"
                     required title="CVV" class="fifty-form-input" type="number" />
 
 

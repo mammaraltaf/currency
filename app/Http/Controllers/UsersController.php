@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 use JetBrains\PhpStorm\ArrayShape;
+use App\Http\Requests\PaymentInformationRequest;
 
 class UsersController extends Controller
 {
@@ -47,7 +48,6 @@ class UsersController extends Controller
         Log::info($verificationCode);
 
         User::putUserIntoSession($userInfoRequest->toArray());
-
         return [
             'status' => 'success',
             'user' => $userInfoRequest

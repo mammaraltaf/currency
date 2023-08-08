@@ -48,7 +48,7 @@ const openCardInfo = () => {
 
     showCardInfoDialog.value = true;
     cardInfo;
-    validationError.value =""
+    validationError.value = ""
     return { transactionInfo, validationError, showCardInfoDialog };
 
 }
@@ -109,9 +109,10 @@ const receiverGetsAmount = computed(() => {
 </script>
 
 <template>
+    <cardInfo :show="showCardInfoDialog" :user="props.user" :transactionInfo="transactionInfo" v-if="showCardInfoDialog"
+        v-on:close="closeCardInfoDialog($event)" />
     <div class="transaction-info-form-wrapper">
-        <cardInfo :show="showCardInfoDialog" :user="props.user" :transactionInfo="transactionInfo" v-if="showCardInfoDialog"
-            v-on:close="closeCardInfoDialog($event)" />
+
         <NewTextInput v-model="transactionInfo.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
             label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number" />
 

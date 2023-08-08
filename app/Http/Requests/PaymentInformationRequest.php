@@ -13,7 +13,8 @@ class PaymentInformationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return !!auth()->user();
+        // return !!auth()->user();
+        return true;
     }
 
     /**
