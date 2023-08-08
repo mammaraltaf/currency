@@ -12,6 +12,10 @@ const props = defineProps({
     user: {
         default: null,
         type: Object
+    },
+    transactionInfo:{
+        default: null,
+        type: Object
     }
 })
 
@@ -57,7 +61,7 @@ const verifyUser = () => {
                 </FiftyText>
 
                 <Transition mode="out-in" name="fade">
-                    <VerifyCode :user="user" @verified="verifyUser"/>
+                    <VerifyCode :user="user" :transactionInfo="transactionInfo" @verified="verifyUser"/>
                 </Transition>
             </div>
         </div>

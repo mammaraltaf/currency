@@ -6,6 +6,7 @@ import ResendEmailCode from "@/Pages/Transaction/Partials/ResendEmailCode.vue";
 import {router} from "@inertiajs/vue3";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
 import NewTextInput from "@/Components/Design/NewTextInput.vue";
+import cardInfo from "@/Pages/Transaction/Partials/forms/CardInfo.vue";
 
 
 const api = useAPI();
@@ -13,6 +14,10 @@ const api = useAPI();
 const props = defineProps({
     user: {
         default: null,
+        type: Object
+    },
+    transactionInfo:{
+        default: Object,
         type: Object
     }
 })
@@ -32,9 +37,10 @@ const verifyEmailCode = async () => {
         const res = await axios.post('/api/verify-user', {
             code: verificationCode.value,
         });
-
+        console.log('res',res);
         if (res.data.status === 'valid') {
             emit('verified');
+            openCardInfo()
             isVerified.value = true;
             notificationStore.notify('Verified', 'success');
         } else {
@@ -57,9 +63,26 @@ const verifyEmailCode = async () => {
     }
 }
 
+// just code placed here
+let showCardInfoDialog = ref(false)
+const openCardInfo = () => {
+
+    showCardInfoDialog.value = true;
+    cardInfo;
+    validationError.value =""
+    return { transactionInfo, validationError, showCardInfoDialog };
+
+}
+function closeCardInfoDialog($isFetchData) {
+    console.log('$isFetchData', $isFetchData);
+    showCardInfoDialog.value = false;
+    return { showCardInfoDialog };
+}
 </script>
 
 <template>
+       <cardInfo :show="showCardInfoDialog" :user="props.user" :transactionInfo="transactionInfo" v-if="showCardInfoDialog"
+            v-on:close="closeCardInfoDialog($event)" />
     <div class="verify-code-form-wrapper">
         <div class="code-input">
             <NewTextInput

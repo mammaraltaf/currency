@@ -18,10 +18,12 @@ use Inertia\Inertia;
 use Inertia\Response;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\HttpFoundation\Response as FoundationResponse;
+use Illuminate\Http\Request;
+use App\Http\Requests\PaymentInformationRequest;
 
 class VerificationController extends Controller
 {
-    public function verifyUserPage(): Response|FoundationResponse
+    public function verifyUserPage(PaymentInformationRequest $paymentInformationRequest): Response|FoundationResponse
     {
         $user = User::getUserFromSession();
 
@@ -37,8 +39,8 @@ class VerificationController extends Controller
 
         $user['email'] = '**********' . substr($user['email'], 10, strlen($user['email']) - 10);
         $user['phone'] = '*****' . substr($user['phone'], 7, strlen($user['email']) - 7);
-
-        return Inertia::render('Transaction/VerifyContacts', ['user' => $user]);
+        $transactionInfo = $request->all();
+        return Inertia::render('Transaction/VerifyContacts', ['user' => $user, 'transactionInfo'=>$transactionInfo]);
     }
 
 

@@ -26,7 +26,7 @@ class CountriesController extends Controller
                 ->orWhere('code', 'LIKE', '%' . request('q') . '%')
                 ->orWhere('can_send', 'LIKE', '%' . request('q') . '%')
                 ->orWhere('can_receive', 'LIKE', '%' . request('q') . '%')
-                ->orWhere('status', 'LIKE', '%' . request('q') . '%')
+                // ->orWhere('status', 'LIKE', '%' . request('q') . '%')
                 ->orWhereHas('currency', function ($query) {
                     $query->where('name', 'LIKE', '%' . request('q') . '%');
                 });

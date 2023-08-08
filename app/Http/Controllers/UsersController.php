@@ -29,8 +29,8 @@ class UsersController extends Controller
         if (!Country::isSupportingSending($locationDetails['country_code'])) {
             return redirect(route('available.posts.page'));
         }
-
-        return Inertia::render('Transaction/UserInfo');
+        $receivingCountries = Country::receivingCountries();
+        return Inertia::render('Transaction/UserInfo', compact('receivingCountries'));
     }
 
     #[ArrayShape(['status' => "string", 'user' => "\App\Http\Requests\UserInfoRequest"])]
