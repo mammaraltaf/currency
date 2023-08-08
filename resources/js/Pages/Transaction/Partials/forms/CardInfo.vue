@@ -116,11 +116,11 @@ const cardInfoSubmit = async () => {
     try {
         console.log('user', user);
         const res = await axios.post('/moneris', user);
-        if (res.data.status === 'success') {
-            goForward('/receiver-info?payment-reference-identification=' + res.data.paymentIntent.id + '&country=' + user.country);
-            notification.notify('Success', 'success');
-            close(true);
 
+        if (res.data.status === 'success') {
+            notification.notify('Success', 'success');
+            // close(true);
+            goForward('/receiver-info?payment-reference-identification=' + 1+ '&country=' + user.country);
         } else {
             notification.notify('Unexpected error happen', 'error');
         }

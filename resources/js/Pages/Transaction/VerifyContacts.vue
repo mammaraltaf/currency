@@ -21,6 +21,9 @@ const openCardInfo = () => {
 }
 function closeCardInfoDialog($isFetchData) {
     console.log('$isFetchData', $isFetchData);
+    if ($isFetchData==true) {
+        notification.notify('Success', 'success');
+    }
     showCardInfoDialog.value = false;
     return { showCardInfoDialog };
 }
