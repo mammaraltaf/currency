@@ -102,11 +102,7 @@ class MonerisPaymentController extends Controller
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
 //                $user = User::getUserFromSession();
-//                Post::create([
-//                    'transaction_id' => $transactionId,
-//                    'country_code' => $user['country'],
-//                    'status' => Post::AVAILABLE,
-//                ]);
+//                dd($user,$response);
 
                 Log::info('Payment successful. Transaction ID: ' . $transactionId);
                 return response()->json(['status' => 'success', 'transactionId' => $transactionId]);
