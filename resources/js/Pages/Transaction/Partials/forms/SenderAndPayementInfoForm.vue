@@ -39,18 +39,17 @@ const geoLocationDetails = usePage().props.geoDetails;
 const isLoadingCurrencyRate = ref(false);
 const currentRate = ref(0);
 const isTransactionPreset = ref(false);
-
+const totalAmount = ref(false)
 const user = reactive({
     'first_name': '',
     'country': geoLocationDetails.country_code,
     'last_name': '',
     'email': '',
     'phone': '',
-    'amount': '100',
+    'amount': '',
     'currency': currencies_countries[geoLocationDetails.country_code],
     'country': '',
 })
-const validationError = ref('');
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
 
@@ -76,7 +75,7 @@ const verifyUserInformation = async (e) => {
     e.preventDefault();
     api.startRequest();
 
-
+    user.amount = totalValue.value.toString()
     try {
         const res = await axios.post('/api/validate-info', { ...user, transactionId: props.transactionId });
         if (res.data.status === 'success') router.get('/verify-contacts?source=' + (props.transactionId ?? 'direct'));
@@ -98,7 +97,22 @@ const phoneCountryChanged = (countryObject) => {
 const cancel = () => {
     router.visit('/');
 }
+let totalValue = ref(0)
+function setTotal() {
+    totalAmount.value = true
+    let total = parseInt(user.amount)
+    if (user.amount < 100) {
+        total = total+10
+    } else if (user.amount >= 100 && user.amount <= 499) {
+        total =total+ 20
+        console.log('user.amount',user.amount,'total',total);
 
+    } else if (user.amount >= 500 && user.amount <= 1000) {
+        total =total+ 30
+    }
+    totalValue.value = total
+    return {totalValue}
+}
 </script>
 
 <template>
@@ -135,17 +149,17 @@ const cancel = () => {
         </FiftyText>
 
         <NewTextInput v-model="user.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
-            label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number" />
+            label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number"
+            @update:modelValue="setTotal" />
 
-        <NewSelectInput v-model="user.currency" :disabled="isTransactionPreset"
-            :errors="api.errors.value?.currency" :options="currencies" label="Currency"
-            placeholder="Currency of your payment card" required title="country" class="fifty-form-input" type="text"
+        <NewSelectInput v-model="user.currency" :disabled="isTransactionPreset" :errors="api.errors.value?.currency"
+            :options="currencies" label="Currency" placeholder="Currency of your payment card" required title="country"
+            class="fifty-form-input" type="text" @update:modelValue="convertCurrencyByCountryCode" />
+
+        <NewSelectInput v-model="user.country" :disabled="isTransactionPreset" :errors="api.errors.value?.country"
+            :options="receivingCountries" label="Receiver Country" label-accessor="label" placeholder="Country" required
+            title="country" class="fifty-form-input country" type="text" value-accessor="code_iso_2"
             @update:modelValue="convertCurrencyByCountryCode" />
-
-        <NewSelectInput v-model="user.country" :disabled="isTransactionPreset"
-            :errors="api.errors.value?.country" :options="receivingCountries" label="Receiver Country"
-            label-accessor="label" placeholder="Country" required title="country" class="fifty-form-input country"
-            type="text" value-accessor="code_iso_2" @update:modelValue="convertCurrencyByCountryCode" />
 
         <transition mode="out-in" name="fade">
             <div v-if="currentRate && user.amount" class="receiver-gets-wrapper m-auto">
@@ -159,13 +173,27 @@ const cancel = () => {
                     </div>
                 </div>
             </div>
+
         </transition>
-        <p class="text-danger">{{ validationError }}</p>
-        <div class="action-buttons">
+        <transition mode="out-in" name="fade">
+            <div v-if="totalAmount" class="receiver-gets-wrapper m-auto">
+                <div class="receiver-gets">
+                    <FiftyText class="title">
+                        Total Amount
+                    </FiftyText>
+                    <!-- <Spinner v-if="isLoadingtotalAmountRate" /> -->
+                    <div class="amount" >
+                        {{ totalValue +' '+user.currency }}
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- <div class="action-buttons"> -->
             <!-- <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" /> -->
 
             <!-- <NewActionButton :isLoading="api.isLoading.value" type="button" title="Continue" @click="openCardInfo" /> -->
-        </div>
+        <!-- </div> -->
         <div class="action-buttons">
             <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" />
 
