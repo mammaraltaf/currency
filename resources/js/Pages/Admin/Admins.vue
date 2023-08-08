@@ -15,6 +15,7 @@ const props = defineProps({
     }
 })
 // sorting
+var currentPage = ref(1)
 var searchValue = ref('');
 var disableClick = ref(false)
 const store = useSortingStore();
@@ -22,13 +23,13 @@ const sort = (column) => {
     searchValue.value = searchValue.value != null ? searchValue.value : ""
     disableClick.value = true
     store.sortValues(column);
-    let res = router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+    let res = router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
     if (res) {
         disableClick.value = false
     }};
 // Search
 const search = () => {
-    router.visit(`?q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+    router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
 }
 const clearSearch = () => {
     router.visit(`?q=`);
@@ -36,6 +37,8 @@ const clearSearch = () => {
 
 onMounted(() => {
     searchValue.value = new URLSearchParams(window.location.search).get('q');
+    let cpg = new URLSearchParams(window.location.search).get('page');
+    currentPage.value = cpg!=null?cpg:1
 });
 </script>
 

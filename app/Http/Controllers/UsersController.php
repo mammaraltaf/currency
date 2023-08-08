@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 use JetBrains\PhpStorm\ArrayShape;
+use App\Http\Requests\PaymentInformationRequest;
 
 class UsersController extends Controller
 {
@@ -29,8 +30,8 @@ class UsersController extends Controller
         if (!Country::isSupportingSending($locationDetails['country_code'])) {
             return redirect(route('available.posts.page'));
         }
-
-        return Inertia::render('Transaction/UserInfo');
+        $receivingCountries = Country::receivingCountries();
+        return Inertia::render('Transaction/UserInfo', compact('receivingCountries'));
     }
 
     #[ArrayShape(['status' => "string", 'user' => "\App\Http\Requests\UserInfoRequest"])]
@@ -47,7 +48,6 @@ class UsersController extends Controller
         Log::info($verificationCode);
 
         User::putUserIntoSession($userInfoRequest->toArray());
-
         return [
             'status' => 'success',
             'user' => $userInfoRequest

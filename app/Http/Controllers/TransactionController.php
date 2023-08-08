@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response as FoundationResponse;
 
 class TransactionController extends Controller
 {
-    public function transactionInfoPage(): Response|FoundationResponse
+    public function transactionInfoPage()
     {
         $user = auth()->user();
 
@@ -28,9 +28,14 @@ class TransactionController extends Controller
             $user->handled_transaction = $user->getHandledTransaction();
         }
 
-        return Inertia::render('Transaction/TransactionInfo',
-            ['user' => $user, 'receivingCountries' => Country::receivingCountries()]
-        );
+        // return Inertia::render('Transaction/TransactionInfo',
+        //     ['user' => $user, 'receivingCountries' => Country::receivingCountries()]
+        // );
+
+        return response()->json([ 'status'=>'success','user' => $user,]) ;
+        //  return Inertia::render('Transaction/TransactionInfo',
+        //     ['user' => $user]
+        // );
     }
 
     public function trackTransactionPage(Request $request): Response
