@@ -9,6 +9,7 @@ import CurrenciesIcon from "@/Icons/CurrenciesIcon.vue";
 import TransactionsIcon from "@/Icons/TransactionsIcon.vue";
 import UsersIcon from "@/Icons/UsersIcon.vue";
 import ReceiversIcon from "@/Icons/ReceiversIcon.vue";
+import TimerIcon from "@/Icons/TimerIcon.vue";
 import {onMounted, ref} from "vue";
 
 const props = defineProps({
@@ -30,7 +31,9 @@ const icons = {
     'countries': CountriesIcon,
     'posts': PostsIcon,
     'transactions': TransactionsIcon,
-    'currencies': CurrenciesIcon
+    'currencies': CurrenciesIcon,
+    'timer': TimerIcon,
+
 }
 
 const isRouteActive = ref(false)
@@ -61,3 +64,10 @@ export default {
     name: 'SidebarElement'
 }
 </script>
+<style scoped>
+svg{
+    font-size: 12px;
+    width: 26px;
+    color: grey;
+}
+</style>

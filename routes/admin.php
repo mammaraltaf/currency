@@ -53,4 +53,6 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // receivers
     Route::get('/admin/receivers', [ReceiverController::class, 'receiversPage'])->name('receivers.page');
     Route::get('/admin/receivers/{receiver}', [ReceiverController::class, 'singleReceiverPage'])->name('single.receiver.page');
+    // timer
+    Route::resource('expiry', UserController::class);
 });

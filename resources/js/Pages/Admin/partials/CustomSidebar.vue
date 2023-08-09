@@ -97,6 +97,12 @@ const toggleSidebar = () => {
                     route-name="currencies.page"
                     title="currencies"
                 />
+
+                <SidebarElement
+                    icon="timer"
+                    route-name="currencies.page"
+                    title="Expiry Timer"
+                />
             </ul>
         </div>
     </aside>
