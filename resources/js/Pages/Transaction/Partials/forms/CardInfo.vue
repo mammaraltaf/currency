@@ -28,7 +28,8 @@ const props = defineProps({
         default: false
     }
 })
-
+let cardValidation = ref(false)
+let cardValidationError = ref('')
 const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -141,7 +142,15 @@ const endEdit = () => {
     // currencyData.value = {};
 }
 
-
+function checkCardNo(){
+    if (user.card_number.length<16 || user.card_number.length>16 ) {
+        cardValidationError.value ="Card number must be 16 digits"
+        cardValidation.value =true
+    }else{
+        cardValidation.value =false
+    }
+    return {cardValidation, cardValidationError}
+}
 
 </script>
 
@@ -150,8 +159,10 @@ const endEdit = () => {
         <Modal :close="close" :isOpen="isModalOpened" header="Card Inforamtion">
             <template #content>
                 <div class="d-lg-flex d-md-flex d-sm-block">
-                    <NewTextInput v-model="user.card_number" :errors="api.errors.value?.card_number"
-                    label="Card Number" placeholder="Card Number" required title="amount" class="fifty-form-input" type="number" />
+                    <NewTextInput v-model="user.card_number" :errors="api.errors.value?.card_number" :min="16"
+                    label="Card Number" placeholder="Card Number" required title="amount" class="fifty-form-input" type="number"
+                    @update:modelValue="checkCardNo"/>
+                    <span class="text-danger" v-if="cardValidation">{{ cardValidationError }}</span>
                 <NewSelectInput v-model="expiryYear" :errors="api.errors.value?.expiry_year" :options="expiryYears"
                     label="Expiry Year" placeholder="Expiry Year of your payment card" required title="country"
                     class="fifty-form-input" type="text" />
@@ -203,5 +214,8 @@ select#rate_source {
     margin:auto;
     width:auto;
 
+}
+span.text-danger{
+    color:red
 }
 </style>
