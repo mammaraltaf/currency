@@ -178,15 +178,15 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                            <th class="px-6 py-3" scope="col"
                                 @click="sort('id')">
                                 Sr.No#
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                            <th class="px-6 py-3" scope="col"
                                 @click="sort('model_name')">
                                 Model Name
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                            <th class="px-6 py-3" scope="col"
                                 @click="sort('time')">
                                 Time
                             </th>
