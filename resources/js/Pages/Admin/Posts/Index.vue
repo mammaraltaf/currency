@@ -62,27 +62,28 @@ function closeEditDialog($isFetchData) {
 }
 // refreshing
 
-let refreshPostId = ref();
+let selectedPostId = ref();
 const refreshPost = async (post) => {
-    console.log(post);
-    refreshPostId.value = post.id;
+    console.log('post', post);
+    selectedPostId.value = post.id;
     index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === post.id);
-    console.log('index.value',index.value);
+    console.log('index.value', index.value);
+    console.log('selectedPostId.value', selectedPostId.value);
     api.startRequest();
 
     try {
-        const res = await axios.delete('/admin/posts/refresh/' + post.id)
-        console.log('res refresh',res);
+        const res = await axios.post('/admin/posts/refresh/' + post.id)
+        console.log('res refresh', res);
 
-        if (res.data.id || res.data.status === 'success') {
-            notification.notify('Post deleted', 'success');
-            post.id = 'deleted';
-            props.posts.total--;
-            props.posts.rows.splice(index.value, 1);
+        if (res.data.status === 'success') {
+            notification.notify('Post Refereshed', 'success');
+            // props.posts.rows.splice(index.value, 1);
+            props.posts.data.splice(index.value, 1, res.data.data);
+
             index.value = null
         }
     } catch (errors) {
-        notification.notify('Error, this base post can not be deleted.', 'error');
+        notification.notify('Error, this base post can not be refreshed.', 'error');
         api.handleErrors(errors)
     } finally {
         api.requestCompleted();
@@ -90,12 +91,11 @@ const refreshPost = async (post) => {
 }
 // Deleting
 
-let deletingPostId = ref();
 const deletePost = async (post) => {
     console.log(post);
-    deletingPostId.value = post.id;
+    selectedPostId.value = post.id;
     index.value = props.posts.data.findIndex(oldInfo => oldInfo.id === post.id);
-    console.log('index.value',index.value);
+    console.log('index.value', index.value);
     api.startRequest();
 
     try {
@@ -150,9 +150,10 @@ const sort = (column) => {
     disableClick.value = true
     store.sortValues(column);
     let res = router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-if (res) {
+    if (res) {
         disableClick.value = false
-    }};
+    }
+};
 // Search
 const search = () => {
     router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
@@ -164,7 +165,7 @@ const clearSearch = () => {
 onMounted(() => {
     searchValue.value = new URLSearchParams(window.location.search).get('q');
     let cpg = new URLSearchParams(window.location.search).get('page');
-    currentPage.value = cpg!=null?cpg:1
+    currentPage.value = cpg != null ? cpg : 1
 });
 
 </script>
@@ -212,25 +213,35 @@ onMounted(() => {
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('created_at')">
-                                Initialized <span class="fw-100">{{ store.column == 'created_at' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('created_at')">
+                                Initialized <span class="fw-100">{{ store.column == 'created_at' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('status')">
-                                Status <span class="fw-100">{{ store.column == 'status' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('status')">
+                                Status <span class="fw-100">{{ store.column == 'status' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('user')">
-                                Country from <span class="fw-100">{{ store.column == 'user' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('user')">
+                                Country from <span class="fw-100">{{ store.column == 'user' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('receiver')">
-                                Country To <span class="fw-100">{{ store.column == 'receiver' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('receiver')">
+                                Country To <span class="fw-100">{{ store.column == 'receiver' ? '(' + store.type + ')' : ''
+                                }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('amount')">
-                                Amount <span class="fw-100">{{ store.column == 'amount' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('amount')">
+                                Amount <span class="fw-100">{{ store.column == 'amount' ? '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'"  scope="col" @click="sort('id')">
-                                Direct Transaction Reference <span class="fw-100">{{ store.column == 'id' ? '('+store.type+')' : '' }}</span>
+                            <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
+                                @click="sort('id')">
+                                Direct Transaction Reference <span class="fw-100">{{ store.column == 'id' ?
+                                    '(' + store.type + ')' : '' }}</span>
                             </th>
-                            <th class="px-6 py-3"   scope="col">
+                            <th class="px-6 py-3" scope="col">
                                 Actions
                             </th>
                         </tr>
@@ -289,10 +300,10 @@ onMounted(() => {
                                 <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
                                     class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
 
-                                <TransactionsIcon @click="refreshPost(post)"
+                                <TransactionsIcon @click="refreshPost(post)" v-if="post.status == 'on_hold'"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
 
-                                <Spinner v-if="api.isLoading.value && deletingPostId.value === post.id"
+                                <Spinner v-if="api.isLoading.value && selectedPostId.value === post.id"
                                     class="button-spinner-center action-btn" />
                             </td>
                         </tr>
@@ -317,6 +328,7 @@ export default {
 th:not(:last-child) {
     cursor: pointer;
 }
+
 .clickable {
     cursor: pointer;
 }
@@ -327,7 +339,7 @@ th:not(:last-child) {
     /* You can adjust the opacity as needed */
     pointer-events: none;
 }
-th span{
+
+th span {
     font-size: 9px;
-}
-</style>
+}</style>

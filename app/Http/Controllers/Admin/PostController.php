@@ -118,7 +118,10 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         $post->makeAvailable();
-        return response()->json(['message' => 'Post refreshed successfully']);
+        $post = Post::find($id);
+        $post->load('transaction.user','transaction.receiver');
+
+        return response()->json(['message' => 'Post refreshed successfully', 'data'=>$post,'status'=>'success']);
     }
 
     public function delete(DeletePostRequest $request, Post $post): array | bool
