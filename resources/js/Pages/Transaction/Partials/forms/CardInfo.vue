@@ -28,6 +28,7 @@ const props = defineProps({
         default: false
     }
 })
+
 const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -86,8 +87,9 @@ const user = reactive({
 });
 onMounted(() => {
     user.amount = props.user.amount;
-    user.country = props.user.country
+    user.country = props.user.receiver_country
 })
+console.log('user',user);
 const isModalOpened = ref(props.show);
 console.log('modal here', isModalOpened.value);
 // const closeModal = () => {

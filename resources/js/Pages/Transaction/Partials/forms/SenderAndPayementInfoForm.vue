@@ -31,7 +31,7 @@ const props = defineProps({
         type: Array
     }
 })
-
+console.log('user',props.user);
 const emit = defineEmits(['stepChanged'])
 const api = useAPI();
 const notification = useNotificationStore();
@@ -47,14 +47,15 @@ const user = reactive({
     'email': '',
     'phone': '',
     'amount': '',
+    'amountTotal': '',
     'currency': currencies_countries[geoLocationDetails.country_code],
-    'country': '',
+    'receiver_country': '',
 })
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
 
     const selectedCountry = props.receivingCountries.find((country) => {
-        return country.code_iso_2 === user.country || country.code === user.country
+        return country.code_iso_2 === user.receiver_country || country.code === user.receiver_country
     });
 
     try {
@@ -75,7 +76,7 @@ const verifyUserInformation = async (e) => {
     e.preventDefault();
     api.startRequest();
 
-    user.amount = totalValue.value.toString()
+    user.amountTotal = totalValue.value.toString()
     try {
         const res = await axios.post('/api/validate-info', { ...user, transactionId: props.transactionId });
         if (res.data.status === 'success') router.get('/verify-contacts?source=' + (props.transactionId ?? 'direct'));
@@ -113,6 +114,19 @@ function setTotal() {
     totalValue.value = total
     return {totalValue}
 }
+
+// const setTransactionValues = () => {
+//     user.amount = parseFloat((props.user.handled_transaction.payment_intent.amount_in_receiver_currency / 100).toFixed(2));
+//     user.country = props.user.handled_transaction.user.country
+// }
+
+// onMounted(() => {
+//     isTransactionPreset.value = !!props.user.transaction_id;
+//     if (isTransactionPreset.value) {
+//         setTransactionValues();
+//     }
+
+// })
 </script>
 
 <template>
@@ -156,10 +170,11 @@ function setTotal() {
             :options="currencies" label="Currency" placeholder="Currency of your payment card" required title="country"
             class="fifty-form-input" type="text" @update:modelValue="convertCurrencyByCountryCode" />
 
-        <NewSelectInput v-model="user.country" :disabled="isTransactionPreset" :errors="api.errors.value?.country"
+        <NewSelectInput v-model="user.receiver_country" :disabled="isTransactionPreset" :errors="api.errors.value?.receiver_country"
             :options="receivingCountries" label="Receiver Country" label-accessor="label" placeholder="Country" required
             title="country" class="fifty-form-input country" type="text" value-accessor="code_iso_2"
-            @update:modelValue="convertCurrencyByCountryCode" />
+            @update:modelValue="convertCurrencyByCountryCode"
+            />
 
         <transition mode="out-in" name="fade">
             <div v-if="currentRate && user.amount" class="receiver-gets-wrapper m-auto">
@@ -169,7 +184,7 @@ function setTotal() {
                     </FiftyText>
                     <Spinner v-if="isLoadingCurrencyRate" />
                     <div class="amount" v-else>
-                        {{ receiverGetsAmount }} {{ currencies_countries[user.country] }}
+                        {{ receiverGetsAmount }} {{ currencies_countries[user.receiver_country] }}
                     </div>
                 </div>
             </div>

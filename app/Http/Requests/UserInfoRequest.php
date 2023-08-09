@@ -33,7 +33,7 @@ class UserInfoRequest extends FormRequest
             'email' => ['required', 'email:rfc,dns', 'max:255'],
             'transactionId' => ['nullable', 'max:255'],
             'amount' => ['required', 'numeric', 'min:1', 'max:10000000'],
-            'country' => ['required', 'string', 'max:191'],
+            'receiver_country' => ['required', 'string', 'max:191'],
             'currency' => ['required', 'string', 'max:191']
         ];
     }
