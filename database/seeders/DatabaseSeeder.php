@@ -20,8 +20,9 @@ class DatabaseSeeder extends Seeder
 //            AbilitySeeder::class,
 //            RoleSeeder::class,
 //            UserSeeder::class,
-            NewRoleSeeder::class,
-            NewUserSeeder::class
+//            NewRoleSeeder::class,
+//            NewUserSeeder::class,
+            UpdateStatusTimeSeeder::class,
         ]);
     }
 }

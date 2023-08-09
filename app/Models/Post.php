@@ -105,4 +105,5 @@ class Post extends Model
             'put_on_hold_at' => null
         ]);
     }
+
 }

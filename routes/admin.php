@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ReceiverController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\UpdateStatusController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -53,4 +54,7 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // receivers
     Route::get('/admin/receivers', [ReceiverController::class, 'receiversPage'])->name('receivers.page');
     Route::get('/admin/receivers/{receiver}', [ReceiverController::class, 'singleReceiverPage'])->name('single.receiver.page');
+
+    Route::post('/admin/update-status-time', [UpdateStatusController::class, 'store'])->name('update.status.store');
+    Route::post('/admin/update-status-time/{id}', [UpdateStatusController::class, 'store'])->name('update.status.update');
 });
