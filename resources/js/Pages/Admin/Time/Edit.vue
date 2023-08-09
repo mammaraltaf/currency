@@ -19,7 +19,7 @@ const props = defineProps({
     },
 })
 const time = reactive({
-    'model_name': 'App\\Models\\Time',
+    'model_name': 'App\\Models\\Post',
     'time': props.timeData.time,
 })
 const isModalOpened = ref(props.show);
@@ -43,7 +43,7 @@ function close(isFetchData) {
 }
 const applyEdit = async () => {
     api.startRequest();
-    console.log('timeData', props.timeData.value, time);
+    console.log('timeData', props.timeData.value.id, time);
     // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     // // Set the CSRF token as a default header for all Axios requests
     // axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;

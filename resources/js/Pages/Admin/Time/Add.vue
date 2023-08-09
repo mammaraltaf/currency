@@ -23,7 +23,7 @@ const endAdd = () => {
 }
 
 const time = reactive({
-    'model_name': 'App\Models\Post',
+    'model_name': 'App\\Models\\Post',
     'time': '',
     // 'status': '',
 })
