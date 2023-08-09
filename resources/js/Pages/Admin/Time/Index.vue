@@ -5,9 +5,7 @@ import Add from "@/Pages/Admin/Time/Add.vue";
 
 import Pagination from "@/Components/Custom/Pagination.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import { useSortingStore } from "@/stores/sorting";
 import Spinner from "@/Components/Custom/Spinner.vue";
-import DeleteIcon from "@/Icons/DeleteIcon.vue";
 import EditIcon from "@/Icons/EditIcon.vue";
 
 import { ref, reactive, onMounted } from "vue";
@@ -58,69 +56,69 @@ function closeEditDialog($isFetchData) {
 
 // Deleting
 
-const deleteTime = async (time) => {
-    console.log(time);
-    selectedTimeId.value = time.id;
-    index.value = props.times.data.findIndex(oldInfo => oldInfo.id === time.id);
-    console.log('index.value', index.value);
-    api.startRequest();
+// const deleteTime = async (time) => {
+//     console.log(time);
+//     selectedTimeId.value = time.id;
+//     index.value = props.times.data.findIndex(oldInfo => oldInfo.id === time.id);
+//     console.log('index.value', index.value);
+//     api.startRequest();
 
-    try {
-        const res = await axios.delete('/admin/times/delete/' + time.id)
+//     try {
+//         const res = await axios.delete('/admin/times/delete/' + time.id)
 
-        if (res.data.id || res.data.status === 'success') {
-            notification.notify('Post deleted', 'success');
-            time.id = 'deleted';
-            props.times.total--;
-            props.times.rows.splice(index.value, 1);
-            index.value = null
-        }
-    } catch (errors) {
-        notification.notify('Error, this base time can not be deleted.', 'error');
-        api.handleErrors(errors)
-    } finally {
-        api.requestCompleted();
-    }
-}
+//         if (res.data.id || res.data.status === 'success') {
+//             notification.notify('Post deleted', 'success');
+//             time.id = 'deleted';
+//             props.times.total--;
+//             props.times.rows.splice(index.value, 1);
+//             index.value = null
+//         }
+//     } catch (errors) {
+//         notification.notify('Error, this base time can not be deleted.', 'error');
+//         api.handleErrors(errors)
+//     } finally {
+//         api.requestCompleted();
+//     }
+// }
 
 const fetchingtimes = ref(false);
 
 // Updating rates:
-const updatePostRates = async () => {
-    api.startRequest();
-    fetchingtimes.value = true;
+// const updatePostRates = async () => {
+//     api.startRequest();
+//     fetchingtimes.value = true;
 
-    try {
-        const res = await axios.put('/admin/times/update-rates')
+//     try {
+//         const res = await axios.put('/admin/times/update-rates')
 
-        if (res.data.status === 'success') {
-            notification.notify('Post rates updated', 'success');
-            props.times.data = res.data.times;
-            props.info.fetched_at = res.data.fetched_at;
-        }
-    } catch (errors) {
-        notification.notify('Error, could not fetch world bank rates.', 'error');
-        api.handleErrors(errors)
-    } finally {
-        fetchingtimes.value = false;
-        api.requestCompleted();
-    }
-}
+//         if (res.data.status === 'success') {
+//             notification.notify('Post rates updated', 'success');
+//             props.times.data = res.data.times;
+//             props.info.fetched_at = res.data.fetched_at;
+//         }
+//     } catch (errors) {
+//         notification.notify('Error, could not fetch world bank rates.', 'error');
+//         api.handleErrors(errors)
+//     } finally {
+//         fetchingtimes.value = false;
+//         api.requestCompleted();
+//     }
+// }
 // sorting
-var currentPage = ref(1)
+// var currentPage = ref(1)
 
-var searchValue = ref('');
-var disableClick = ref(false)
-const store = useSortingStore();
-const sort = (column) => {
-    searchValue.value = searchValue.value != null ? searchValue.value : ""
-    disableClick.value = true
-    store.sortValues(column);
-    let res = router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-    if (res) {
-        disableClick.value = false
-    }
-};
+// var searchValue = ref('');
+// var disableClick = ref(false)
+// const store = useSortingStore();
+// const sort = (column) => {
+//     searchValue.value = searchValue.value != null ? searchValue.value : ""
+//     disableClick.value = true
+//     store.sortValues(column);
+//     let res = router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
+//     if (res) {
+//         disableClick.value = false
+//     }
+// };
 // Search
 // const search = () => {
 //     router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
@@ -161,7 +159,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <Add  @timeAdded="timeAdded" />
+            <!-- <Add  @timeAdded="timeAdded" /> -->
             <!-- <div class="flex items-end gap-3 ">
                 <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
                     v-on:keyup.enter="search" />
@@ -182,17 +180,15 @@ onMounted(() => {
                         <tr>
                             <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
                                 @click="sort('id')">
-                                Sr.No#  <span class="fw-100">{{ store.column == 'id' ? '(' + store.type + ')' : ''
-                                }}</span>
+                                Sr.No#
                             </th>
                             <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
                                 @click="sort('model_name')">
-                                Model Name <span class="fw-100">{{ store.column == 'model_name' ? '(' + store.type + ')' : '' }}</span>
+                                Model Name
                             </th>
                             <th class="px-6 py-3" :class="disableClick ? 'disabled' : 'clickable'" scope="col"
                                 @click="sort('time')">
-                                Time <span class="fw-100">{{ store.column == 'time' ? '(' + store.type + ')' : ''
-                                }}</span>
+                                Time
                             </th>
                             <th class="px-6 py-3" scope="col">
                                 Actions
@@ -214,9 +210,7 @@ onMounted(() => {
                                 </p>
                             </td>
                             <td class="px-6 py-3" scope="col">
-                                <DeleteIcon @click="deleteTime(time)"
-                                    class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1" />
-                                <EditIcon @click="edit(time)" v-if="time.status == 'on_hold'"
+                               <EditIcon @click="edit(time)" v-if="time.status == 'on_hold'"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
                                 <Spinner v-if="api.isLoading.value && selectedTimeId.value === time.id"
                                     class="button-spinner-center action-btn" />
@@ -239,22 +233,4 @@ export default {
 }
 </script>
 
-<style scoped>
-th:not(:last-child) {
-    cursor: pointer;
-}
-
-.clickable {
-    cursor: pointer;
-}
-
-.disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    /* You can adjust the opacity as needed */
-    pointer-events: none;
-}
-
-th span {
-    font-size: 9px;
-}</style>
+<style scoped></style>
