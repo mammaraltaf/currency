@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import Edit from "@/Pages/Admin/ExpiryTim/Edit.vue";
-import Add from "@/Pages/Admin/ExpiryTim/Add.vue";
+import Edit from "@/Pages/Admin/Time/Edit.vue";
+import Add from "@/Pages/Admin/Time/Add.vue";
 
 import Pagination from "@/Components/Custom/Pagination.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
@@ -34,13 +34,13 @@ const timeAdded = (data) => {
 }
 
 // Editing:
-const editingPost = reactive({});
+const editingTime = reactive({});
 var showEditDialog = ref(false);
 
 var index = ref()
 const edit = (time) => {
-    editingPost.value = { ...time };
-    index.value = props.times.data.findIndex(oldInfo => oldInfo.id === editingPost.value.id);
+    editingTime.value = { ...time };
+    index.value = props.times.data.findIndex(oldInfo => oldInfo.id === editingTime.value.id);
     console.log(' index.value', index.value);
 
     showEditDialog.value = true;
@@ -48,41 +48,14 @@ const edit = (time) => {
     return { showEditDialog, Edit };
 }
 function closeEditDialog($isFetchData) {
-    props.times.data.splice(index.value, 1, editingPost.value);
+    console.log('closeEditDialog',$isFetchData);
+    props.times.data.splice(index.value, 1, $isFetchData);
     showEditDialog.value = false;
     index.value = null
 
     return { showEditDialog };
 }
-// refreshing
 
-let selectedTimeId = ref();
-const refreshPost = async (time) => {
-    console.log('time', time);
-    selectedTimeId.value = time.id;
-    index.value = props.times.data.findIndex(oldInfo => oldInfo.id === time.id);
-    console.log('index.value', index.value);
-    console.log('selectedTimeId.value', selectedTimeId.value);
-    api.startRequest();
-
-    try {
-        const res = await axios.time('/admin/times/refresh/' + time.id)
-        console.log('res refresh', res);
-
-        if (res.data.status === 'success') {
-            notification.notify('Post Refereshed', 'success');
-            // props.times.rows.splice(index.value, 1);
-            props.times.data.splice(index.value, 1, res.data.data);
-
-            index.value = null
-        }
-    } catch (errors) {
-        notification.notify('Error, this base time can not be refreshed.', 'error');
-        api.handleErrors(errors)
-    } finally {
-        api.requestCompleted();
-    }
-}
 // Deleting
 
 const deleteTime = async (time) => {
@@ -165,7 +138,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Edit :show="showEditDialog" :receivers="props.receivers" :timeData="editingPost" v-if="showEditDialog"
+    <Edit :show="showEditDialog" :timeData="editingTime" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
     <Head title="Expiry Times">
@@ -188,7 +161,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <Add :receivers="props.receivers" @timeAdded="timeAdded" />
+            <Add  @timeAdded="timeAdded" />
             <!-- <div class="flex items-end gap-3 ">
                 <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
                     v-on:keyup.enter="search" />
@@ -227,10 +200,10 @@ onMounted(() => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="time in props.times.data" :key="time.id"
+                        <tr v-for="(time,key) in props.times.data" :key="time.id"
                             class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
                             <td class="px-6 py-4">
-                                {{ key }}
+                                {{ key+1 }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
                                 {{ time.model_name }}
@@ -243,7 +216,7 @@ onMounted(() => {
                             <td class="px-6 py-3" scope="col">
                                 <DeleteIcon @click="deleteTime(time)"
                                     class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1" />
-                                <EditIcon @click="refreshPost(time)" v-if="time.status == 'on_hold'"
+                                <EditIcon @click="edit(time)" v-if="time.status == 'on_hold'"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
                                 <Spinner v-if="api.isLoading.value && selectedTimeId.value === time.id"
                                     class="button-spinner-center action-btn" />

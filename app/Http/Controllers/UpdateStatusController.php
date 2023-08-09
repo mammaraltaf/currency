@@ -6,9 +6,16 @@ use App\Http\Requests\UpdateStatusStoreRequest;
 use App\Models\Post;
 use App\Models\UpdateStatusTime;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class UpdateStatusController extends Controller
 {
+    public function index(){
+        return Inertia::render('Admin/Time/Index', [
+            'times' => UpdateStatusTime::paginate(10),
+        ]);
+    }
     public function store(UpdateStatusStoreRequest $request)
     {
         try{
