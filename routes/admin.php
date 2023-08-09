@@ -57,5 +57,5 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
 
     Route::get('/admin/update-status-time', [UpdateStatusController::class, 'index'])->name('time.page');
     Route::post('/admin/update-status-time', [UpdateStatusController::class, 'store'])->name('update.status.store');
-    Route::put('/admin/update-status-time/{id}', [UpdateStatusController::class, 'update'])->name('update.status.update');
+    Route::put('/admin/update-status-time/{updateStatusTime}', [UpdateStatusController::class, 'update'])->name('update.status.update');
 });

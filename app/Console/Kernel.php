@@ -17,13 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            // Update the status of posts created exactly 10 minutes ago
-            $tenMinutesAgo = Carbon::now()->subMinutes(1);
-           Post::where('status', Post::ON_HOLD)
-                ->where('created_at', '<=', $tenMinutesAgo)
-                ->update(['status' => Post::AVAILABLE]);
-        })->everyMinute();;
+        $schedule->command('update:status')->everyMinute();
     }
 
     /**

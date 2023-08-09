@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Post;
+use App\Models\UpdateStatusTime;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -29,10 +30,19 @@ class UpdateStatus extends Command
      */
     public function handle()
     {
-        // Update the status of posts created exactly 10 minutes ago
-        $tenMinutesAgo = Carbon::now()->subMinutes(1);
-        Post::where('status', Post::AVAILABLE)
-            ->where('created_at', '<=', $tenMinutesAgo)
-            ->update(['status' => Post::ON_HOLD]);
+        /*get post time*/
+        $time = Carbon::now()->subMinutes(UpdateStatusTime::first()->time);
+        /*get posts created before the time*/
+        $posts = Post::where('status', Post::AVAILABLE)
+            ->where('created_at', '<=', $time)
+            ->get();
+
+        /*update status of posts*/
+        $posts->each(function ($post) {
+            $post->update([
+                'status' => Post::ON_HOLD,
+                'put_on_hold_at' => Carbon::now(),
+            ]);
+        });
     }
 }
