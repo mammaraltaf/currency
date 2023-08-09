@@ -158,7 +158,7 @@ class MonerisPaymentController extends Controller
                 $post = Post::create($postData);
 
                 $data = [
-                    'payment_intent_id' => $stripePaymentIntentId,
+                    'payment_intent_id' => $paymentIntent->id,
                     'country' => $sessionData['country'],
                     'transactionId' => $transactionId,
                 ];
