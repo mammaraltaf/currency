@@ -210,7 +210,7 @@ onMounted(() => {
                                 </p>
                             </td>
                             <td class="px-6 py-3" scope="col">
-                               <EditIcon @click="edit(time)" v-if="time.status == 'on_hold'"
+                               <EditIcon @click="edit(time)"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
                                 <Spinner v-if="api.isLoading.value && selectedTimeId.value === time.id"
                                     class="button-spinner-center action-btn" />
