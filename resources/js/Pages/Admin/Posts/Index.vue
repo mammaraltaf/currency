@@ -8,7 +8,7 @@ import { Head, Link, router } from "@inertiajs/vue3";
 import { useSortingStore } from "@/stores/sorting";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import DeleteIcon from "@/Icons/DeleteIcon.vue";
-import TransactionsIcon from "@/Icons/TransactionsIcon.vue";
+import RefreshIcon from "@/Icons/RefreshIcon.vue";
 
 import { ref, reactive, onMounted } from "vue";
 import { useAPI } from "@/Composables/useAPI";
@@ -300,7 +300,7 @@ onMounted(() => {
                                 <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
                                     class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
 
-                                <TransactionsIcon @click="refreshPost(post)" v-if="post.status == 'on_hold'"
+                                <RefreshIcon @click="refreshPost(post)" v-if="post.status == 'on_hold'"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
 
                                 <Spinner v-if="api.isLoading.value && selectedPostId.value === post.id"
@@ -342,4 +342,8 @@ th:not(:last-child) {
 
 th span {
     font-size: 9px;
-}</style>
+}
+svg.bi.bi-arrow-clockwise.w-8.hover\:cursor-pointer.hover\:bg-blue-600.hover\:text-white.rounded-md.p-1{
+    height: 30px;
+}
+</style>
