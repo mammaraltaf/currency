@@ -54,84 +54,9 @@ function closeEditDialog($isFetchData) {
     return { showEditDialog };
 }
 
-// Deleting
-
-// const deleteTime = async (time) => {
-//     console.log(time);
-//     selectedTimeId.value = time.id;
-//     index.value = props.times.data.findIndex(oldInfo => oldInfo.id === time.id);
-//     console.log('index.value', index.value);
-//     api.startRequest();
-
-//     try {
-//         const res = await axios.delete('/admin/times/delete/' + time.id)
-
-//         if (res.data.id || res.data.status === 'success') {
-//             notification.notify('Post deleted', 'success');
-//             time.id = 'deleted';
-//             props.times.total--;
-//             props.times.rows.splice(index.value, 1);
-//             index.value = null
-//         }
-//     } catch (errors) {
-//         notification.notify('Error, this base time can not be deleted.', 'error');
-//         api.handleErrors(errors)
-//     } finally {
-//         api.requestCompleted();
-//     }
-// }
 
 const fetchingtimes = ref(false);
 
-// Updating rates:
-// const updatePostRates = async () => {
-//     api.startRequest();
-//     fetchingtimes.value = true;
-
-//     try {
-//         const res = await axios.put('/admin/times/update-rates')
-
-//         if (res.data.status === 'success') {
-//             notification.notify('Post rates updated', 'success');
-//             props.times.data = res.data.times;
-//             props.info.fetched_at = res.data.fetched_at;
-//         }
-//     } catch (errors) {
-//         notification.notify('Error, could not fetch world bank rates.', 'error');
-//         api.handleErrors(errors)
-//     } finally {
-//         fetchingtimes.value = false;
-//         api.requestCompleted();
-//     }
-// }
-// sorting
-// var currentPage = ref(1)
-
-// var searchValue = ref('');
-// var disableClick = ref(false)
-// const store = useSortingStore();
-// const sort = (column) => {
-//     searchValue.value = searchValue.value != null ? searchValue.value : ""
-//     disableClick.value = true
-//     store.sortValues(column);
-//     let res = router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-//     if (res) {
-//         disableClick.value = false
-//     }
-// };
-// Search
-// const search = () => {
-//     router.visit(`?page=${currentPage.value}&q=${searchValue.value}&column=${store.column}&type=${store.type}`);
-// }
-// const clearSearch = () => {
-//     router.visit(`?q=`);
-// }
-
-onMounted(() => {
-    // searchValue.value = new URLSearchParams(window.location.search).get('q');
-    // let cpg = new URLSearchParams(window.location.search).get('page');
-    // currentPage.value = cpg != null ? cpg : 1
-});
 
 </script>
 
@@ -139,9 +64,9 @@ onMounted(() => {
     <Edit :show="showEditDialog" :timeData="editingTime" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
-    <Head title="Expiry Times">
+    <Head title="Global Variables">
         <title>
-            Expiry Times
+            Global Variables
         </title>
     </Head>
 
@@ -158,22 +83,6 @@ onMounted(() => {
                     to: {{ props.times.to }}
                 </div>
             </div>
-
-            <!-- <Add  @timeAdded="timeAdded" /> -->
-            <!-- <div class="flex items-end gap-3 ">
-                <TextInput v-model="searchValue" class="mb-8" label="Search by" placeholder="Search" title="searchValue"
-                    v-on:keyup.enter="search" />
-
-                <button @click="search" type="button"
-                    class="mb-8 flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                    Search
-                </button>
-
-                <button v-if="searchValue" @click="clearSearch" type="button"
-                    class="mb-8 flex items-center text-blue-700 bg-white border border-blue-700 hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                    Clear
-                </button>
-            </div> -->
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

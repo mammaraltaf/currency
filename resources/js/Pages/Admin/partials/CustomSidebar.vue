@@ -101,7 +101,7 @@ const toggleSidebar = () => {
                 <SidebarElement
                     icon="timer"
                     route-name="time.page"
-                    title="Expiry Timer"
+                    title="Global Variables"
                 />
             </ul>
         </div>

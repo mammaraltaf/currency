@@ -13,7 +13,7 @@ import RefreshIcon from "@/Icons/RefreshIcon.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useAPI } from "@/Composables/useAPI";
 import { useNotificationStore } from "@/stores/notification";
-import SaveIcon from "@/Icons/SaveIcon.vue";
+import EditIcon from "@/Icons/EditIcon.vue";
 import TextInput from "@/Components/TextInput.vue";
 
 const api = useAPI();
@@ -118,27 +118,7 @@ const deletePost = async (post) => {
 
 const fetchingposts = ref(false);
 
-// Updating rates:
-const updatePostRates = async () => {
-    api.startRequest();
-    fetchingposts.value = true;
 
-    try {
-        const res = await axios.put('/admin/posts/update-rates')
-
-        if (res.data.status === 'success') {
-            notification.notify('Post rates updated', 'success');
-            props.posts.data = res.data.posts;
-            props.info.fetched_at = res.data.fetched_at;
-        }
-    } catch (errors) {
-        notification.notify('Error, could not fetch world bank rates.', 'error');
-        api.handleErrors(errors)
-    } finally {
-        fetchingposts.value = false;
-        api.requestCompleted();
-    }
-}
 // sorting
 var currentPage = ref(1)
 
@@ -167,11 +147,22 @@ onMounted(() => {
     let cpg = new URLSearchParams(window.location.search).get('page');
     currentPage.value = cpg != null ? cpg : 1
 });
+// class of the status
+function getClass(status){
+    let flag = "info"
+    if (status=='available') {
+        flag='success'
+    }else if(status=="on_hold"){
+        flag='danger'
+    }
+    return flag;
+    }
+
 
 </script>
 
 <template>
-    <Edit :show="showEditDialog" :receivers="props.receivers" :postData="editingPost" v-if="showEditDialog"
+    <Edit :show="showEditDialog" :postData="editingPost" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
     <Head title="Posts">
@@ -253,7 +244,7 @@ onMounted(() => {
                                 {{ post.created_at }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                                {{ post.status }}
+                               <span :class="getClass(post.status)"> {{ post.status }}</span>
                             </td>
                             <td class="px-6 py-3" scope="col">
                                 <p>
@@ -297,8 +288,8 @@ onMounted(() => {
                                 <DeleteIcon @click="deletePost(post)"
                                     class="w-8 hover:cursor-pointer hover:bg-red-600 hover:text-white rounded-md p-1" />
 
-                                <!-- <SaveIcon v-if="editingPost.value?.id === post.id" @click="applyEdit"
-                                    class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" /> -->
+                                <EditIcon  @click="edit(post)"
+                                    class="w-8 hover:cursor-pointer hover:bg-green-600 hover:text-white rounded-md p-1" />
 
                                 <RefreshIcon @click="refreshPost(post)" v-if="post.status == 'on_hold'"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
@@ -345,5 +336,27 @@ th span {
 }
 svg.bi.bi-arrow-clockwise.w-8.hover\:cursor-pointer.hover\:bg-blue-600.hover\:text-white.rounded-md.p-1{
     height: 30px;
+}
+.danger{
+     background-color: #ff6666;
+    color: white;
+    padding: 2px 4px;
+    font-size: 13px;
+    border-radius: 3px;
+
+}
+.success{
+    background-color: #2dcb2d;
+    color: white;
+    padding: 2px 4px;
+    font-size: 13px;
+    border-radius: 3px;
+}
+.info {
+    background-color: #4dd8ff;
+    color: white;
+    padding: 2px 4px;
+    font-size: 13px;
+    border-radius: 3px;
 }
 </style>

@@ -1,11 +1,13 @@
 <script setup>
-import { ref, reactive,computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import { useAPI } from "@/Composables/useAPI";
 import { useNotificationStore } from "@/stores/notification";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import Modal from "@/Components/Custom/Modal.vue";
 import SelectInput from "@/Components/Custom/SelectInput.vue";
 import { countries } from "@/helpers/countries";
+import { postStatus } from "@/helpers/postStatus";
+import TextInput from "@/Components/TextInput.vue";
 
 const notification = useNotificationStore();
 const api = useAPI();
@@ -20,58 +22,36 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    receivers:{
-        required: true,
-        type: Object
-    },
 })
-console.log('i m here post edit', props.postData.value);
+console.log('post', props.postData);
 const post = reactive({
-    'transaction_id': props.postData.transaction_id,
-    'country_code': props.postData.country_code,
-    'status': props.postData.status,
+    'amount': props.postData.value.transaction.payment_intent.amount,
+    'status': props.postData.value.status,
 })
-let allCountries = computed(() => {
-    return countries.map((country) => ({
-    label: country.value +"("+country.label+")",
-    value: country.value
-  }));
-});
-let allreceivers = computed(() => {
-    return props.receivers.map((transaction) => ({
-    label: transaction.user.first_name+' '+transaction.user.last_name+"(Sender)",
-    value: transaction.id
-  }));
-});
 const isModalOpened = ref(props.show);
-console.log('modal here', isModalOpened.value);
-// const closeModal = () => {
-//     isModalOpened.value = false;
+// console.log('modal here', isModalOpened.value);
+// // const closeModal = () => {
+// //     isModalOpened.value = false;
+// // }
+// const openModal = () => {
+//     console.log('inside openModal ');
+//     if (props.show) return;
+//     isModalOpened.value = true;
 // }
-const openModal = () => {
-    console.log('inside openModal ');
-    if (props.show) return;
-    isModalOpened.value = true;
-}
 
 
 // Emits
 const emit = defineEmits(['close'])
 
 function close(isFetchData) {
-    console.log('this s iedit',isFetchData)
-    ;
+    console.log('this s iedit', isFetchData);
     emit("close", isFetchData);
 }
 const applyEdit = async () => {
     api.startRequest();
-    console.log('postData', props.postData.value);
-    // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    // // Set the CSRF token as a default header for all Axios requests
-    // axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
-    // console.log('csrfToken', csrfToken);
+    console.log('postdata here',post);
     try {
-        const res = await axios.put('/admin/posts/update/' + props.postData.value.id, props.postData.value)
+        const res = await axios.put('/admin/posts/update/' + props.postData.value.id, post)
 
         if (res.data) {
             notification.notify('Post updated', 'success');
@@ -80,10 +60,10 @@ const applyEdit = async () => {
         }
     } catch (errors) {
         console.log('errors', errors);
-        // notification.notify('Error', 'error');
-        // api.handleErrors(errors)
+        notification.notify('Error', 'error');
+        api.handleErrors(errors)
     } finally {
-        // api.requestCompleted();
+        api.requestCompleted();
     }
 }
 
@@ -99,35 +79,13 @@ const endEdit = () => {
             <template #content>
                 <form class="  p-2 mb-2" @submit.prevent="submit">
                     <div class="flex flex-wrap gap-2 mb-3 justify-content-center">
-                        <SelectInput
-                    v-model="postData.value.transaction_id"
-                    :errors="api.errors.value?.transaction_id"
-                    :options="allreceivers"
-                    :selected="postData.value.transaction_id"
-                    label="receivers"
-                    required
-                    placeholder=" Select "
-                    title="Transaction"
-                    type="text"
-                />
-                 <SelectInput
-                    v-model="postData.value.country_code"
-                    :errors="api.errors.value?.country_code"
-                    :options="allCountries"
-                    :selected="postData.value.country_code"
-                    label="Country Code"
-                    required
-                    placeholder=" Select "
-                    title="Country Code"
-                    type="text"
-                />
-                <div>
-                    <label>Status</label>
-                <input type="checkbox" :class="post.status ? 'slider-checked' : ''"
-                                    class="slider" v-model="postData.value.status"
-                                    :checked="postData.value.status?'checked':''"
-                                 />
-                </div>
+                        <SelectInput v-model="post.status" :errors="api.errors.value?.status"
+                            :options="postStatus" label="Status" required placeholder=" Select " title="Status"
+                            type="text" />
+                        <TextInput v-model="post.amount"
+                            :errors="api.errors.value?.amount" label="Amount" placeholder="Amount" required title="amount"
+                            class="fifty-form-input" type="number" />
+
                     </div>
 
                     <div class="flex gap-4 items-center">
@@ -163,6 +121,7 @@ select#rate_source {
 .flex.flex-wrap.gap-2.mb-3.justify-content-center {
     justify-content: center;
 }
+
 .slider {
     /* -webkit-appearance: none; */
     width: 40px;
