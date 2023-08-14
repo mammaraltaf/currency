@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Classes\CurrencyExchange;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Posts\UpdateRequest;
 use App\Models\Post;
@@ -72,12 +73,40 @@ class PostController extends Controller
             }
 
             DB::beginTransaction();
+
+            $amount = $request->input('amount', 1) * 100;
+            if ($request->input('receiver_id') != null) {
+                $receiver = Receiver::find($request->input('receiver_id'));
+                if (!$receiver) {
+                    throw new \Exception('No receiver found with the given id.');
+                }
+
+                $receiverCountry = Country::where('code', $receiver->country)
+                                    ->orWhere('code_iso_2',$receiver->country)
+                                    ->first();
+
+                if (!$receiverCountry) {
+                    throw new \Exception('No country found with the given code.');
+                }
+
+                $requiredCurrency = $receiverCountry->currency->code;
+
+                if (!$requiredCurrency) {
+                    throw new \Exception('No currency found with the given code.');
+                }
+                $baseCurrency = $request->input('currency', 'USD');
+                $amount_in_receiver_currency[] = CurrencyExchange::convertCurrencies($baseCurrency, $requiredCurrency);
+                $currencyValue = $amount_in_receiver_currency[0][$requiredCurrency]['value'] * $amount;
+            }
+
             /*Store Payment Intent Data*/
             $paymentIntentData = [
                 'stripe_payment_intent_id' => $request->input('stripe_payment_intent_id', rand(100000, 999999)),
-                'amount' => $request->input('amount', 0),
+                'amount' => $amount,
                 'currency' => $request->input('currency', 'usd'),
                 'status' => $request->input('status', Post::AVAILABLE),
+                'receiver_id' => $request->input('receiver_id'),
+                'amount_in_receiver_currency' => $currencyValue ?? 1,
             ];
 
             $paymentIntent = $fiftyUserEmails->paymentIntents()->create($paymentIntentData);
