@@ -23,7 +23,7 @@ class UserInfoRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules(Request $request): array
+    public function rules(): array
     {
         return [
             'first_name' => ['required', 'max:255', 'min:2', 'string'],
@@ -32,9 +32,9 @@ class UserInfoRequest extends FormRequest
             'phone' => ['required', new ValidPhoneNumber],
             'email' => ['required', 'email:rfc,dns', 'max:255'],
             'transactionId' => ['nullable', 'max:255'],
-            'amount' => ['required', 'numeric', 'min:1', 'max:10000000'],
-            'receiver_country' => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:191']
+//            'amount' => ['required', 'numeric', 'min:1', 'max:10000000'],
+//            'receiver_country' => ['required', 'string', 'max:191'],
+//            'currency' => ['required', 'string', 'max:191']
         ];
     }
 }
