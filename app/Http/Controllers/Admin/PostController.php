@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Posts\UpdateRequest;
 use App\Models\Post;
 use App\Models\Country;
 use App\Models\Role;
@@ -123,6 +124,49 @@ class PostController extends Controller
 
         return response()->json(['message' => 'Post refreshed successfully', 'data'=>$post,'status'=>'success']);
     }
+
+    /*Update Post*/
+    public function update(UpdateRequest $request, Post $post)
+    {
+        try {
+            DB::beginTransaction();
+
+            $status = $request->input('status');
+            switch ($status) {
+                case Post::AVAILABLE:
+                    $post->makeAvailable();
+                    break;
+                case Post::ON_HOLD:
+                    $post->putOnHold();
+                    break;
+            }
+
+
+            $post->update([
+                'status' => $status,
+            ]);
+
+            $post->transaction()->paymentIntent()->update([
+                'amount' => $request->input('amount', $post->transaction->paymentIntent->amount),
+            ]);
+
+
+            $post->load('transaction.user','transaction.receiver');
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Post updated successfully.',
+                'data' => $post,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function delete(DeletePostRequest $request, Post $post): array | bool
     {
