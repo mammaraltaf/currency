@@ -175,7 +175,7 @@ class PostController extends Controller
                 'status' => $status,
             ]);
 
-            $post->transaction()->paymentIntent()->update([
+            $post->transaction->paymentIntent->update([
                 'amount' => $request->input('amount', $post->transaction->paymentIntent->amount),
             ]);
 
