@@ -106,7 +106,7 @@ const toggleSidebar = () => {
                 <SidebarElement
                     icon="timer"
                     route-name="commission.page"
-                    title="Commission Amount"
+                    title="Commission"
                 />
             </ul>
         </div>
