@@ -7,6 +7,7 @@ use App\Classes\Twilio;
 use App\Classes\UniqueNumberGenerator;
 use App\Http\Requests\UserInfoRequest;
 use App\Mail\EmailCodeGenerated;
+use App\Models\Commission;
 use App\Models\Country;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
@@ -26,12 +27,13 @@ class UsersController extends Controller
     public function userInfoPage()
     {
         $locationDetails = GeoLocation::getCurrentUserLocationDetails();
+        $commissions = Commission::all();
 
         if (!Country::isSupportingSending($locationDetails['country_code'])) {
             return redirect(route('available.posts.page'));
         }
         $receivingCountries = Country::receivingCountries();
-        return Inertia::render('Transaction/UserInfo', compact('receivingCountries'));
+        return Inertia::render('Transaction/UserInfo', compact('receivingCountries', 'commissions'));
     }
 
     #[ArrayShape(['status' => "string", 'user' => "\App\Http\Requests\UserInfoRequest"])]

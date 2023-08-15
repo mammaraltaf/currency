@@ -272,7 +272,7 @@ function getClass(status){
                                 <p>
                                     {{ parseFloat(post.transaction.payment_intent.amount / 100).toFixed(2) }}
                                     <span class="uppercase">
-                                        ({{ post.transaction.payment_intent.post }})
+                                        ({{ post.transaction.payment_intent.currency }})
                                     </span>
                                 </p>
 
