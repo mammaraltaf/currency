@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import Edit from "@/Pages/Admin/Time/Edit.vue";
-import Add from "@/Pages/Admin/Time/Add.vue";
+import Edit from "@/Pages/Admin/Range/Edit.vue";
+// import Add from "@/Pages/Admin/Range/Add.vue";
 
 import Pagination from "@/Components/Custom/Pagination.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
@@ -17,28 +17,28 @@ import TextInput from "@/Components/TextInput.vue";
 const api = useAPI();
 const notification = useNotificationStore();
 const props = defineProps({
-    times: {
+    ranges: {
         required: true,
         type: Object
     },
 })
-// console.log('times', props.times);
+// console.log('ranges', props.ranges);
 // Adding
-const timeAdded = (data) => {
-    // props.times.data.push(data.data);
-    props.times.data.unshift(data.data)
-    props.times.total++;
+// const rangeAdded = (data) => {
+//     // props.ranges.data.push(data.data);
+//     props.ranges.data.unshift(data.data)
+//     props.ranges.total++;
 
-}
+// }
 
 // Editing:
-const editingTime = reactive({});
+const editingRange = reactive({});
 var showEditDialog = ref(false);
 
 var index = ref()
-const edit = (time) => {
-    editingTime.value = { ...time };
-    index.value = props.times.data.findIndex(oldInfo => oldInfo.id === editingTime.value.id);
+const edit = (range) => {
+    editingRange.value = { ...range };
+    index.value = props.ranges.data.findIndex(oldInfo => oldInfo.id === editingRange.value.id);
     console.log(' index.value', index.value);
 
     showEditDialog.value = true;
@@ -47,7 +47,7 @@ const edit = (time) => {
 }
 function closeEditDialog($isFetchData) {
     console.log('closeEditDialog',$isFetchData);
-    props.times.data.splice(index.value, 1, $isFetchData);
+    props.ranges.data.splice(index.value, 1, $isFetchData);
     showEditDialog.value = false;
     index.value = null
 
@@ -55,18 +55,18 @@ function closeEditDialog($isFetchData) {
 }
 
 
-const fetchingtimes = ref(false);
+const fetchingranges = ref(false);
 
 
 </script>
 
 <template>
-    <Edit :show="showEditDialog" :timeData="editingTime" v-if="showEditDialog"
+    <Edit :show="showEditDialog" :rangeData="editingRange" v-if="showEditDialog"
         v-on:close="closeEditDialog($event)" />
 
-    <Head title="Time Setting">
+    <Head title="Range Setting">
         <title>
-            Time Setting
+            Range Setting
         </title>
     </Head>
 
@@ -74,13 +74,13 @@ const fetchingtimes = ref(false);
         <div class="ml-4 md:ml-8 mr-4 md:mr-8">
             <div class="mt-16 mb-8 text-xl flex items-center justify-between">
                 <div>
-                    times
+                    ranges
                 </div>
                 <div class="text-sm">
-                    Page: {{ props.times.current_page }}
-                    | total: {{ props.times.total }}
-                    | from: {{ props.times.from }},
-                    to: {{ props.times.to }}
+                    Page: {{ props.ranges.current_page }}
+                    | total: {{ props.ranges.total }}
+                    | from: {{ props.ranges.from }},
+                    to: {{ props.ranges.to }}
                 </div>
             </div>
             <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -92,12 +92,16 @@ const fetchingtimes = ref(false);
                                 Sr.No#
                             </th>
                             <th class="px-6 py-3" scope="col"
-                                @click="sort('model_name')">
-                                Model Name
+                                @click="sort('from')">
+                                From
                             </th>
                             <th class="px-6 py-3" scope="col"
-                                @click="sort('time')">
-                                Time
+                                @click="sort('to')">
+                                To
+                            </th>
+                            <th class="px-6 py-3" scope="col"
+                                @click="sort('amount')">
+                                Amount
                             </th>
                             <th class="px-6 py-3" scope="col">
                                 Actions
@@ -105,23 +109,29 @@ const fetchingtimes = ref(false);
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(time,key) in props.times.data" :key="time.id"
+                        <tr v-for="(range,key) in props.ranges.data" :key="range.id"
                             class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
                             <td class="px-6 py-4">
                                 {{ key+1 }}
                             </td>
-                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                                {{ time.model_name }}
-                            </td>
+
                             <td class="px-6 py-3" scope="col">
                                 <p>
-                                    {{ time.time }}
+                                    {{ range.from }}
                                 </p>
                             </td>
                             <td class="px-6 py-3" scope="col">
-                               <EditIcon @click="edit(time)"
+                                <p>
+                                    {{ range.to }}
+                                </p>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
+                                {{ range.amount }}
+                            </td>
+                            <td class="px-6 py-3" scope="col">
+                               <EditIcon @click="edit(range)"
                                     class="w-8 hover:cursor-pointer hover:bg-blue-600 hover:text-white rounded-md p-1" />
-                                <Spinner v-if="api.isLoading.value && selectedTimeId.value === time.id"
+                                <Spinner v-if="api.isLoading.value && selectedRangeId.value === range.id"
                                     class="button-spinner-center action-btn" />
                             </td>
                         </tr>
@@ -129,7 +139,7 @@ const fetchingtimes = ref(false);
                 </table>
             </div>
 
-            <Pagination :links="props.times.links" />
+            <Pagination :links="props.ranges.links" />
         </div>
 
     </AdminLayout>
@@ -138,7 +148,7 @@ const fetchingtimes = ref(false);
 <script>
 
 export default {
-    name: 'times/Index'
+    name: 'ranges/Index'
 }
 </script>
 

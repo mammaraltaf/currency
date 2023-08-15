@@ -101,7 +101,12 @@ const toggleSidebar = () => {
                 <SidebarElement
                     icon="timer"
                     route-name="time.page"
-                    title="Global Variables"
+                    title="Time Setting"
+                />
+                <SidebarElement
+                    icon="timer"
+                    route-name="commission.page"
+                    title="Commission Amount"
                 />
             </ul>
         </div>

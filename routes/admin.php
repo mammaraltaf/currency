@@ -59,4 +59,9 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     Route::get('/admin/update-status-time', [UpdateStatusController::class, 'index'])->name('time.page');
     Route::post('/admin/update-status-time', [UpdateStatusController::class, 'store'])->name('update.status.store');
     Route::put('/admin/update-status-time/{updateStatusTime}', [UpdateStatusController::class, 'update'])->name('update.status.update');
+
+    // NEWLY ADDED  amount range Setting  //UPDATE THE CONTROLLER NAME ETc
+    Route::get('/admin/amount-range', [UpdateStatusController::class, 'index'])->name('amount.range.page');
+    Route::post('/admin/amount-range', [UpdateStatusController::class, 'store'])->name('amount.range.store');
+    Route::put('/admin/amount-range/{updateStatusTime}', [UpdateStatusController::class, 'update'])->name('amount.range.update');
 });
