@@ -52,11 +52,10 @@ const applyEdit = async () => {
     console.log('postdata here',post);
     try {
         const res = await axios.put('/admin/posts/update/' + props.postData.value.id, post)
-
+        console.log('res',res);
         if (res.data) {
             notification.notify('Post updated', 'success');
-            endEdit();
-            close(postData.value);
+            close(res.data.data);
         }
     } catch (errors) {
         console.log('errors', errors);
@@ -67,10 +66,10 @@ const applyEdit = async () => {
     }
 }
 
-const endEdit = () => {
-    api.errors.value = {};
-    postData.value = {};
-}
+// const endEdit = () => {
+//     api.errors.value = {};
+//     postData.value = {};
+// }
 </script>
 
 <template>

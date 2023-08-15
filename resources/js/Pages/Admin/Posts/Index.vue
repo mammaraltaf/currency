@@ -54,7 +54,7 @@ const edit = (post) => {
     return { showEditDialog, Edit };
 }
 function closeEditDialog($isFetchData) {
-    props.posts.data.splice(index.value, 1, editingPost.value);
+    props.posts.data.splice(index.value, 1, $isFetchData);
     showEditDialog.value = false;
     index.value = null
 
