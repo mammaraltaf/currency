@@ -27,7 +27,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'from' => ['required', 'numeric', new ValidateRowRanges()],
-            'to' => ['required', 'numeric'],
+            'to' => ['required', 'numeric', new ValidateRowRanges()],
             'amount' => ['required', 'numeric'],
         ];
     }

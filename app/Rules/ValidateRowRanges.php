@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\Commission;
 use Illuminate\Contracts\Validation\Rule;
 
 class ValidateRowRanges implements Rule
@@ -12,9 +13,19 @@ class ValidateRowRanges implements Rule
         $from = $data['from'];
         $to = $data['to'];
 
-        foreach ($data['rows'] as $row) {
-            if ($row['from'] <= $to && $row['to'] >= $from) {
-                return false; // Invalid range overlap
+        if ($from >= $to) {
+            return false; // Invalid range
+        }
+
+        // Fetch existing rows from the database
+        $existingRows = Commission::where('id', '!=', request()->route('commission')->id)->get();
+
+        foreach ($existingRows as $row) {
+            if ($from >= $row->from && $from <= $row->to) {
+                return false; // Invalid range
+            }
+            if ($to >= $row->from && $to <= $row->to) {
+                return false; // Invalid range
             }
         }
 
