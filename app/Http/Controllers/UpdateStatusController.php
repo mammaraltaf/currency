@@ -43,9 +43,9 @@ class UpdateStatusController extends Controller
     {
         try{
             $updateStatusTime->update([
-                'model_name' => $request->model_name ?? $updateStatusTime->model_name,
-                'status' => $request->status ?? Post::ON_HOLD,
-                'time' => $request->time,
+                'model_name' => isset($request->model_name) ? $request->model_name : $updateStatusTime->model_name,
+                'status' => isset($request->status) ? $request->status : $updateStatusTime->status,
+                'time' => $request->time ?? $updateStatusTime->time,
             ]);
 
             return response()->json([

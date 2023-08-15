@@ -19,7 +19,7 @@ const props = defineProps({
     },
 })
 const time = reactive({
-    'model_name': 'App\\Models\\Post',
+    // 'model_name': 'App\\Models\\Post',
     'time': props.timeData.time,
 })
 const isModalOpened = ref(props.show);

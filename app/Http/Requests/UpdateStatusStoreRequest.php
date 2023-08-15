@@ -24,8 +24,8 @@ class UpdateStatusStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'model_name' => 'required|string',
-//            'status' => 'required|string',
+            'model_name' => 'nullable|string',
+            'status' => 'nullable|string',
             'time' => 'required|integer|min:1',
         ];
     }

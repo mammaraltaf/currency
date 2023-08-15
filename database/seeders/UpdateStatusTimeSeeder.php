@@ -21,5 +21,10 @@ class UpdateStatusTimeSeeder extends Seeder
             'status' => Post::ON_HOLD,
             'time' => 6000,
         ]);
+
+        UpdateStatusTime::create([
+            'model_name' => 'App\Models\Transaction',
+            'time' => 6000,
+        ]);
     }
 }

@@ -97,12 +97,22 @@ class Post extends Model
         ]);
     }
 
+    public function putOnHoldSelected(): bool
+    {
+        return $this->update([
+            'status' => Post::ON_HOLD,
+            'is_selected' => true, // this is to make sure that the post is not available for other users.
+            'put_on_hold_at' => Carbon::now()
+        ]);
+    }
+
     public function makeAvailable(): bool
     {
         // we can not make it available if the corresponding transaction has any state higher than pairing pending.
         return $this->update([
             'status' => Post::AVAILABLE,
-            'put_on_hold_at' => null
+            'put_on_hold_at' => null,
+            'created_at' => Carbon::now(),
         ]);
     }
 

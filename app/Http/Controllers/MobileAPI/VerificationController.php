@@ -113,6 +113,6 @@ class VerificationController
 
     protected function putPostOnHold($transaction_id): void
     {
-        Post::where('transaction_id', $transaction_id)->first()->putOnHold();
+        Post::where('transaction_id', $transaction_id)->first()->putOnHoldSelected();
     }
 }
