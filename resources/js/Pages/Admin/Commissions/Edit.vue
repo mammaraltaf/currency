@@ -9,7 +9,7 @@ const notification = useNotificationStore();
 const api = useAPI();
 // Props:
 const props = defineProps({
-    rangeData: {
+    commissionsData: {
         type: Object,
         required: true
     },
@@ -18,28 +18,29 @@ const props = defineProps({
         default: false
     },
 })
-const range = reactive({
-    'from': props.rangeData.from,
-    'to': props.rangeData.to,
-    'amount': props.rangeData.amount,
+console.log('commissionsData',props.commissionsData);
+const commissions = reactive({
+    'from': props.commissionsData.value.from,
+    'to': props.commissionsData.value.to,
+    'amount': props.commissionsData.value.amount,
 })
+const isModalOpened = ref(props.show);
 
 // Emits
 const emit = defineEmits(['close'])
 
 function close(isFetchData) {
-    console.log('this s iedit', isFetchData)
-        ;
     emit("close", isFetchData);
 }
 const applyEdit = async () => {
     api.startRequest();
-    console.log('rangeData', props.rangeData.value.id, range);
+    console.log('commissionsData', props.commissionsData.value.id, commissions);
     try {
-        const res = await axios.put('/admin/amount-range/' + props.rangeData.value.id, range)
+        const res = await axios.put('/admin/commission/' + props.commissionsData.value.id, commissions)
+    console.log('res', res);
         if (res.data) {
-            notification.notify('Time updated', 'success');
-            close(range);
+            notification.notify('Commission updated', 'success');
+            close(commissions);
         }
     } catch (errors) {
         console.log('errors', errors);
@@ -52,21 +53,21 @@ const applyEdit = async () => {
 
 const endEdit = () => {
     api.errors.value = {};
-    rangeData.value = {};
+    commissionsData.value = {};
 }
 </script>
 
 <template>
     <div>
-        <Modal :close="close" :isOpen="isModalOpened" header="Amount Range">
+        <Modal :close="close" :isOpen="isModalOpened" header="Amount commissions">
             <template #content>
                 <form class="  p-2 mb-2" @submit.prevent="submit">
                     <div class="flex flex-wrap gap-2 mb-3 justify-content-center">
-                        <TextInput v-model="range.from" label="From" placeholder="From" required
+                        <TextInput v-model="commissions.from" label="From" placeholder="From" required
                             title="code" />
-                        <TextInput v-model="range.to" label="To" placeholder="To" required
+                        <TextInput v-model="commissions.to" label="To" placeholder="To" required
                             title="code" />
-                        <TextInput v-model="range.amount" label="Amount" placeholder="Amount" required
+                        <TextInput v-model="commissions.amount" label="Amount" placeholder="Amount" required
                             title="code" />
                     </div>
 
@@ -130,7 +131,7 @@ select#rate_source {
     cursor: pointer;
 }
 
-.slider::-moz-range-thumb {
+.slider::-moz-commissions-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;

@@ -47,7 +47,10 @@ class CommissionController extends Controller
     {
         try {
             $commission->update($request->validated());
-
+            return response()->json([
+                'message' => 'Updated successfully',
+                'data' => $commission
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
