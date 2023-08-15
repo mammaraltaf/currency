@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Commission;
 
 use App\Models\Post;
+use App\Rules\ValidateRowRanges;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -25,9 +26,9 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'from' => 'required|numeric',
-            'to' => 'required|numeric',
-            'amount' => 'required|numeric',
+            'from' => ['required', 'numeric', new ValidateRowRanges()],
+            'to' => ['required', 'numeric'],
+            'amount' => ['required', 'numeric'],
         ];
     }
 }
