@@ -41,6 +41,7 @@ const notificationStore = useNotificationStore();
 
 const continueToPayment = async () => {
     if (emailVerified.value) {
+
         // router.get('/transaction-info')
         notificationStore.notify('Verified', 'success');
 
