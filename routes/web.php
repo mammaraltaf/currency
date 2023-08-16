@@ -99,6 +99,8 @@ Route::prefix('api')->group(function () {
     // Banks:
     Route::get('/banks/{country}', [BankController::class, 'getListOfBanksByCountry'])->name('banks.list');
 
+    Route::get('/get-international-banks', [UsersController::class, 'getInternationalBanks'])->name('get.international.banks');
+
 });
 
 // Transactions:

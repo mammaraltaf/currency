@@ -56,4 +56,14 @@ class UsersController extends Controller
         ];
     }
 
+    public function getInternationalBanks(PaymentInformationRequest $request): array
+    {
+        $countryCode = $request->country_code;
+        $banks = Country::getCountryByCode($countryCode);
+        return [
+            'status' => 'success',
+            'banks' => $banks
+        ];
+    }
+
 }
