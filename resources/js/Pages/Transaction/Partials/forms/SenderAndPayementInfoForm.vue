@@ -137,7 +137,7 @@ const getBankList = async () => {
     let country = user.receiver.country
     console.log('country',country);
     try {
-        const res = await axios.get('/api/get-international-banks', { country });
+        const res = await axios.get('/api/get-international-banks/country_code?', { country });
         if (res.data.status === 'success') {
             console.log('res',res);
         }
