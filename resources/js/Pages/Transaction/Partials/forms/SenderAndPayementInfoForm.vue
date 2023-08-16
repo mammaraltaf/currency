@@ -91,7 +91,7 @@ const convertCurrencyByCountryCode = async () => {
 const verifyUserInformation = async (e) => {
     e.preventDefault();
     api.startRequest();
-
+    console.log('user', user);
     user.amountTotal = totalValue.value.toString()
     try {
         const res = await axios.post('/api/validate-info', { ...user, transactionId: props.transactionId });
@@ -139,6 +139,7 @@ const getBankList = async () => {
         const res = await axios.get('/api/get-international-banks?country_code=' + country);
         console.log('res.banks', res);
         if (res.data.status == 'success') {
+            bankOptions.value = []
             console.log('res.banks', res.banks);
             res.data.banks.forEach(bank => {
                 bankOptions.value.push({
@@ -146,6 +147,7 @@ const getBankList = async () => {
                     'value': bank.id,
                 })
             });
+            console.log('bankoptions', bankOptions.value);
             convertCurrencyByCountryCode()
             // console.log('banks.value',bankOptions.value);
             // return {bankOptions}
@@ -219,10 +221,12 @@ const getBankList = async () => {
 
         <!-- start -->
         <div class="receiver-info-form-wrapper">
-            <NewTextInput class="fifty-form-input" v-model="user.receiver_first_name" :errors="api.errors.value?.receiver_first_name"
-                label="First Name" placeholder="John" required title="first_name" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver_last_name" :errors="api.errors.value?.receiver_last_name"
-                label="Last Name" placeholder="Doe" required title="last_name" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_first_name"
+                :errors="api.errors.value?.receiver_first_name" label="First Name" placeholder="John" required
+                title="first_name" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_last_name"
+                :errors="api.errors.value?.receiver_last_name" label="Last Name" placeholder="Doe" required
+                title="last_name" />
             <NewTextInput class="fifty-form-input" v-model="user.receiver_email" :errors="api.errors.value?.receiver_email"
                 label="Email" placeholder="john@example.com" title="email" />
             <InternationalTelInput :errors="api.errors.value?.phone" :required="false" label="Phone Number" title="phone"
@@ -241,9 +245,9 @@ const getBankList = async () => {
             <NewSelectInput class="fifty-form-input" v-model="user.receiver_country"
                 :errors="api.errors.value?.receiver_country" :options="countries" label="Country" placeholder="Country"
                 required title="country" type="text" @update:modelValue="getBankList" />
-            <NewSelectInput class="fifty-form-input" v-model="user.receiver_bank_id" :errors="api.errors.value?.receiver_bank_id"
-                :options="bankOptions" label="International Bank" label-accessor="label" placeholder="International Bank"
-                required title="bank" type="text" value-accessor="id" />
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver_bank_id"
+                :errors="api.errors.value?.receiver_bank_id" :options="bankOptions" label="International Bank"
+                placeholder="International Bank" required title="bank" type="text" />
             <NewTextInput class="fifty-form-input" v-model="user.receiver_account_number"
                 :errors="api.errors.value?.receiver_account_number" label="Account Number" placeholder="123456789" required
                 title="account_number" />
