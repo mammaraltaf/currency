@@ -26,15 +26,15 @@ class UserInfoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'max:255', 'min:2', 'string'],
-            'last_name' => ['required', 'max:255', 'min:2', 'string'],
-            'country' => ['required', 'max:255', 'min:2', 'string'],
-            'phone' => ['required', new ValidPhoneNumber],
-            'email' => ['required', 'email:rfc,dns', 'max:255'],
-            'transactionId' => ['nullable', 'max:255'],
-            'amount' => ['required', 'numeric', 'min:1', 'max:10000000'],
-            'receiver_country' => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:191']
+            // 'first_name' => ['required', 'max:255', 'min:2', 'string'],
+            // 'last_name' => ['required', 'max:255', 'min:2', 'string'],
+            // 'country' => ['required', 'max:255', 'min:2', 'string'],
+            // 'phone' => ['required', new ValidPhoneNumber],
+            // 'email' => ['required', 'email:rfc,dns', 'max:255'],
+            // 'transactionId' => ['nullable', 'max:255'],
+            // 'amount' => ['required', 'numeric', 'min:1', 'max:10000000'],
+            // 'receiver_country' => ['required', 'string', 'max:191'],
+            // 'currency' => ['required', 'string', 'max:191']
         ];
     }
 }

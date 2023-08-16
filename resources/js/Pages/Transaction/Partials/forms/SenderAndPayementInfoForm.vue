@@ -13,6 +13,8 @@ import NewTextInput from "@/Components/Design/NewTextInput.vue";
 import NewSelectInput from "@/Components/Design/NewSelectInput.vue";
 import FiftyText from "@/Components/Design/FiftyText.vue";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
+import NewTextArea from "@/Components/Design/NewTextArea.vue";
+
 import Spinner from "@/Components/Custom/Spinner.vue";
 
 const props = defineProps({
@@ -25,13 +27,17 @@ const props = defineProps({
         default: null,
         type: Object
     },
+    commissions:{
+        default: null,
+        type: Object
+    },
     receivingCountries: {
         required: true,
         default: [],
         type: Array
     }
 })
-console.log('user',props.user);
+console.log('commissions', props.commissions);
 const emit = defineEmits(['stepChanged'])
 const api = useAPI();
 const notification = useNotificationStore();
@@ -49,7 +55,17 @@ const user = reactive({
     'amount': '',
     'amountTotal': '',
     'currency': currencies_countries[geoLocationDetails.country_code],
-    'receiver_country': '',
+    'receiver': {
+        'first_name': '',
+        'last_name': '',
+        'email': '',
+        'phone': '',
+        'receiver_country': '',
+        'bank_id': '',
+        'account_number': '',
+        'branch_number': '',
+        'banking_info': '',
+    },
 })
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
@@ -101,18 +117,28 @@ const cancel = () => {
 let totalValue = ref(0)
 function setTotal() {
     totalAmount.value = true
-    let total = parseInt(user.amount)
-    if (user.amount < 100) {
-        total = total+10
-    } else if (user.amount >= 100 && user.amount <= 499) {
-        total =total+ 20
-        console.log('user.amount',user.amount,'total',total);
+    let total = parseFloat(user.amount)
+    // if (user.amount < 100) {
+    //     total = total + 10
+    // } else if (user.amount >= 100 && user.amount <= 499) {
+    //     total = total + 20
+    //     console.log('user.amount', user.amount, 'total', total);
 
-    } else if (user.amount >= 500 && user.amount <= 1000) {
-        total =total+ 30
+    // } else if (user.amount >= 500 && user.amount <= 1000) {
+    //     total = total + 30
+    // }
+    for (const range of props.commissions) {
+  console.log('props.commissions',props.commissions);
+
+    if (total >parseFloat(range.from)  && total <= parseFloat(range.to)) {
+  console.log('range.amount)',range.amount);
+
+        total = total + parseFloat(range.amount)        // return;
     }
+  }
+  console.log('total',total);
     totalValue.value = total
-    return {totalValue}
+    return { totalValue }
 }
 
 // const setTransactionValues = () => {
@@ -153,29 +179,72 @@ function setTotal() {
 
             </vue-tel-input>
         </InternationalTelInput>
-
+        <NewTextInput v-model="user.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
+            label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number"
+            @update:modelValue="setTotal" />
         <NewSelectInput v-model="user.country" :errors="api.errors.value?.country" :options="countries" disabled
-            label="Country" placeholder="Country" required title="country" type="text" class="sender-input country" />
+            label="Country" placeholder="Country" required title="country" type="text" class="fifty-form-input" />
 
 
         <FiftyText variation="heading-3">
             Enter Receiver Information
         </FiftyText>
 
-        <NewTextInput v-model="user.amount" :disabled="isTransactionPreset" :errors="api.errors.value?.amount"
-            label="Amount" placeholder="99" required title="amount" class="fifty-form-input" type="number"
-            @update:modelValue="setTotal" />
 
-        <NewSelectInput v-model="user.currency" :disabled="isTransactionPreset" :errors="api.errors.value?.currency"
+
+        <!-- <NewSelectInput v-model="user.currency" :disabled="isTransactionPreset" :errors="api.errors.value?.currency"
             :options="currencies" label="Currency" placeholder="Currency of your payment card" required title="country"
             class="fifty-form-input" type="text" @update:modelValue="convertCurrencyByCountryCode" />
 
-        <NewSelectInput v-model="user.receiver_country" :disabled="isTransactionPreset" :errors="api.errors.value?.receiver_country"
-            :options="receivingCountries" label="Receiver Country" label-accessor="label" placeholder="Country" required
-            title="country" class="fifty-form-input country" type="text" value-accessor="code_iso_2"
-            @update:modelValue="convertCurrencyByCountryCode"
-            />
+        <NewSelectInput v-model="user.receiver_country" :disabled="isTransactionPreset"
+            :errors="api.errors.value?.receiver_country" :options="receivingCountries" label="Receiver Country"
+            label-accessor="label" placeholder="Country" required title="country" class="fifty-form-input country"
+            type="text" value-accessor="code_iso_2" @update:modelValue="convertCurrencyByCountryCode" /> -->
 
+        <!-- start -->
+        <div class="receiver-info-form-wrapper">
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.first_name" :errors="api.errors.value?.first_name"
+                label="First Name" placeholder="John" required title="first_name" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.last_name" :errors="api.errors.value?.last_name"
+                label="Last Name" placeholder="Doe" required title="last_name" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.email" :errors="api.errors.value?.email" label="Email"
+                placeholder="john@example.com" title="email" />
+            <InternationalTelInput :errors="api.errors.value?.phone" :required="false" label="Phone Number" title="phone"
+                class="fifty-form-input">
+                <vue-tel-input id="exampleFormControlInput1" ref="input" v-model="user.receiver.phone"
+                    :class="{ 'error-border': api.errors.value?.phone?.length > 0 }"
+                    :inputOptions="{ 'placeholder': '123456789' }"
+                    :onlyCountries="isTransactionPreset ? [user.receiver.country] : []" class="form-control block w-full px-0 py-0 text-lg font-normal h-10
+              text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition
+              ease-linear m-0
+              focus:text-gray-700 focus:bg-white focus:border-indigo-300 focus:outline-none" mode="international"
+                    @country-changed="phoneCountryChanged">
+
+                </vue-tel-input>
+            </InternationalTelInput>
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver.receiver_country" :errors="api.errors.value?.receiver_country"
+                :options="countries" disabled label="Country" placeholder="Country" required title="country" type="text" />
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver.bank_id" :errors="api.errors.value?.bank_id"
+                :options="banks" label="International Bank" label-accessor="label" placeholder="International Bank" required
+                title="bank" type="text" value-accessor="id" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.account_number"
+                :errors="api.errors.value?.account_number" label="Account Number" placeholder="123456789" required
+                title="account_number" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.branch_number"
+                :errors="api.errors.value?.branch_number" label="Branch Number" placeholder="123456789"
+                title="branch_number" />
+            <NewTextArea v-model="user.receiver.banking_info" :errors="api.errors.value?.banking_info"
+                label="Additional Information / Comments" placeholder="I am open to different payment options..."
+                title="banking_info" />
+
+            <!-- <div class="action-buttons">
+                <NewActionButton :reversed="true" title="Back" @click="goBack" />
+
+                <NewActionButton :isLoading="api.isLoading.value" title="Continue" @click="saveReceiver" />
+            </div> -->
+        </div>
+
+        <!-- end -->
         <transition mode="out-in" name="fade">
             <div v-if="currentRate && user.amount" class="receiver-gets-wrapper m-auto">
                 <div class="receiver-gets">
@@ -197,17 +266,17 @@ function setTotal() {
                         Total Amount
                     </FiftyText>
                     <!-- <Spinner v-if="isLoadingtotalAmountRate" /> -->
-                    <div class="amount" >
-                        {{ totalValue +' '+user.currency }}
+                    <div class="amount">
+                        {{ totalValue + ' ' + user.currency }}
                     </div>
                 </div>
             </div>
         </transition>
 
         <!-- <div class="action-buttons"> -->
-            <!-- <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" /> -->
+        <!-- <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" /> -->
 
-            <!-- <NewActionButton :isLoading="api.isLoading.value" type="button" title="Continue" @click="openCardInfo" /> -->
+        <!-- <NewActionButton :isLoading="api.isLoading.value" type="button" title="Continue" @click="openCardInfo" /> -->
         <!-- </div> -->
         <div class="action-buttons">
             <NewActionButton :reversed="true" type="button" title="Cancel" @click="cancel" />

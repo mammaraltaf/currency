@@ -27,11 +27,11 @@ class TransactionController extends Controller
         if ($user->handlingTransaction()) {
             $user->handled_transaction = $user->getHandledTransaction();
         }
-
-        // return Inertia::render('Transaction/TransactionInfo',
-        //     ['user' => $user, 'receivingCountries' => Country::receivingCountries()]
-        // );
-
+        // THIS WILL BE UPDATED ACCORDINGLY IF THE USER IS COMPLETING A TRANSACTION OR CREATING A NEW ONE
+        return Inertia::render('Transaction/TransactionInfo',
+            ['user' => $user, 'receivingCountries' => Country::receivingCountries()]
+        );
+        // NEW ONE
         return response()->json([ 'status'=>'success','user' => $user,]) ;
         //  return Inertia::render('Transaction/TransactionInfo',
         //     ['user' => $user]
