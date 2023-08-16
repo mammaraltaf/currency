@@ -28,6 +28,7 @@ const user = reactive({
     'last_name': '',
     'email': '',
     'phone': '',
+    'flag':'complete_transaction',
 })
 
 const verifyUserInformation = async (e) => {

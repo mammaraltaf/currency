@@ -27,7 +27,7 @@ const props = defineProps({
         default: null,
         type: Object
     },
-    commissions:{
+    commissions: {
         default: null,
         type: Object
     },
@@ -66,6 +66,7 @@ const user = reactive({
         'branch_number': '',
         'banking_info': '',
     },
+    'flag': 'send_now',
 })
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
@@ -118,29 +119,35 @@ let totalValue = ref(0)
 function setTotal() {
     totalAmount.value = true
     let total = parseFloat(user.amount)
-    // if (user.amount < 100) {
-    //     total = total + 10
-    // } else if (user.amount >= 100 && user.amount <= 499) {
-    //     total = total + 20
-    //     console.log('user.amount', user.amount, 'total', total);
-
-    // } else if (user.amount >= 500 && user.amount <= 1000) {
-    //     total = total + 30
-    // }
     for (const range of props.commissions) {
-  console.log('props.commissions',props.commissions);
+        console.log('props.commissions', props.commissions);
 
-    if (total >parseFloat(range.from)  && total <= parseFloat(range.to)) {
-  console.log('range.amount)',range.amount);
+        if (total > parseFloat(range.from) && total <= parseFloat(range.to)) {
+            console.log('range.amount)', range.amount);
 
-        total = total + parseFloat(range.amount)        // return;
+            total = total + parseFloat(range.amount)        // return;
+        }
     }
-  }
-  console.log('total',total);
+    console.log('total', total);
     totalValue.value = total
     return { totalValue }
 }
-
+const getBankList = async () => {
+    api.startRequest();
+    let country = user.receiver.country
+    console.log('country',country);
+    try {
+        const res = await axios.get('/api/get-international-banks', { country });
+        if (res.data.status === 'success') {
+            console.log('res',res);
+        }
+    } catch (errors) {
+        notification.notify('Something went wrong...', 'error');
+        api.handleErrors(errors)
+    } finally {
+        api.requestCompleted();
+    }
+};
 // const setTransactionValues = () => {
 //     user.amount = parseFloat((props.user.handled_transaction.payment_intent.amount_in_receiver_currency / 100).toFixed(2));
 //     user.country = props.user.handled_transaction.user.country
@@ -207,8 +214,8 @@ function setTotal() {
                 label="First Name" placeholder="John" required title="first_name" />
             <NewTextInput class="fifty-form-input" v-model="user.receiver.last_name" :errors="api.errors.value?.last_name"
                 label="Last Name" placeholder="Doe" required title="last_name" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.email" :errors="api.errors.value?.email" label="Email"
-                placeholder="john@example.com" title="email" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver.email" :errors="api.errors.value?.email"
+                label="Email" placeholder="john@example.com" title="email" />
             <InternationalTelInput :errors="api.errors.value?.phone" :required="false" label="Phone Number" title="phone"
                 class="fifty-form-input">
                 <vue-tel-input id="exampleFormControlInput1" ref="input" v-model="user.receiver.phone"
@@ -222,8 +229,9 @@ function setTotal() {
 
                 </vue-tel-input>
             </InternationalTelInput>
-            <NewSelectInput class="fifty-form-input" v-model="user.receiver.receiver_country" :errors="api.errors.value?.receiver_country"
-                :options="countries" disabled label="Country" placeholder="Country" required title="country" type="text" />
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver.country"
+                :errors="api.errors.value?.receiver_country" :options="countries" label="Country" placeholder="Country"
+                required title="country" type="text" @update:modelValue="getBankList" />
             <NewSelectInput class="fifty-form-input" v-model="user.receiver.bank_id" :errors="api.errors.value?.bank_id"
                 :options="banks" label="International Bank" label-accessor="label" placeholder="International Bank" required
                 title="bank" type="text" value-accessor="id" />
