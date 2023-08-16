@@ -26,6 +26,11 @@ const props = defineProps({
         default: null,
         type: Object
     },
+    commissions: {
+        // required: true,
+        default: null,
+        type: Object
+    },
     receivingCountries: {
         required: true,
         default: [],
@@ -51,7 +56,7 @@ const props = defineProps({
                 </FiftyText>
 
                 <Transition mode="out-in" name="fade">
-                    <SenderAndPayementInfoForm :user="user" :receivingCountries="props.receivingCountries" :transactionId="props.transactionId" />
+                    <SenderAndPayementInfoForm :user="user" :commissions="props.commissions" :receivingCountries="props.receivingCountries" :transactionId="props.transactionId" />
                 </Transition>
 
             </div>

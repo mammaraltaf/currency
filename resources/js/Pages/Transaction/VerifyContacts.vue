@@ -1,7 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import { useNotificationStore } from "@/stores/notification";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import VerifyCode from "@/Pages/Transaction/Partials/VerifyCode.vue";
 import TransactionSteps from "@/Pages/Transaction/Partials/TransactionSteps.vue";
@@ -10,7 +10,13 @@ import cardInfo from "@/Pages/Transaction/Partials/forms/CardInfo.vue";
 
 import { useAPI } from "@/Composables/useAPI";
 const api = useAPI();
+const paramSource = ref('');
 
+onMounted(() => {
+    // Access the parameter value from the URL
+    paramSource.value = new URLSearchParams(window.location.search).get('source');
+    console.log('paramSource', paramSource.value);
+});
 // just code placed here
 let showCardInfoDialog = ref(false)
 const openCardInfo = () => {
@@ -21,7 +27,7 @@ const openCardInfo = () => {
 }
 function closeCardInfoDialog($isFetchData) {
     console.log('$isFetchData', $isFetchData);
-    if ($isFetchData==true) {
+    if ($isFetchData == true) {
         notification.notify('Success', 'success');
     }
     showCardInfoDialog.value = false;
@@ -34,15 +40,19 @@ const props = defineProps({
         type: Object
     },
 })
-let currentStep =ref('verify-contacts')
+let currentStep = ref('verify-contacts')
 const emailVerified = ref(!!props.user.email_verified_at);
 
 const notificationStore = useNotificationStore();
 
 const continueToPayment = async () => {
     if (emailVerified.value) {
-        // router.get('/transaction-info')
-        notificationStore.notify('Verified', 'success');
+        if (paramSource.value != '') {
+            router.get('/transaction-info')
+
+        } else {
+            notificationStore.notify('Verified', 'success');
+        }
 
     } else {
         notificationStore.notify('Please verify your information first', 'error');
@@ -51,10 +61,17 @@ const continueToPayment = async () => {
 
 const verifyUser = () => {
     emailVerified.value = true;
-    currentStep.value = "card-info";
-    openCardInfo()
+    if (paramSource.value != '') {
+    currentStep.value = "transaction-info";
 
-    continueToPayment();
+        continueToPayment();
+
+    } else {
+    currentStep.value = "card-info";
+        openCardInfo()
+
+    }
+
 }
 
 
@@ -84,7 +101,7 @@ const verifyUser = () => {
                 </FiftyText>
 
                 <Transition mode="out-in" name="fade">
-                    <VerifyCode :user="user"  @verified="verifyUser" />
+                    <VerifyCode :user="user" @verified="verifyUser" />
                 </Transition>
             </div>
         </div>

@@ -27,12 +27,11 @@ class TransactionController extends Controller
         if ($user->handlingTransaction()) {
             $user->handled_transaction = $user->getHandledTransaction();
         }
-
-        // return Inertia::render('Transaction/TransactionInfo',
-        //     ['user' => $user, 'receivingCountries' => Country::receivingCountries()]
-        // );
-
-        return response()->json([ 'status'=>'success','user' => $user,]) ;
+        // THIS WILL BE UPDATED ACCORDINGLY IF THE USER IS COMPLETING A TRANSACTION OR CREATING A NEW ONE
+        //    COMPLETE TRANSACTION
+        return Inertia::render('Transaction/TransactionInfo', ['user' => $user, 'receivingCountries' => Country::receivingCountries()]);
+        // SEND NOW
+        return response()->json(['status' => 'success', 'user' => $user]);
         //  return Inertia::render('Transaction/TransactionInfo',
         //     ['user' => $user]
         // );
@@ -40,20 +39,22 @@ class TransactionController extends Controller
 
     public function trackTransactionPage(Request $request): Response
     {
-        $transaction = Transaction::with('oppositeTransaction.user', 'user:id,first_name')->where('id', $request->transaction)->first();
+        $transaction = Transaction::with('oppositeTransaction.user', 'user:id,first_name')
+            ->where('id', $request->transaction)
+            ->first();
 
         if (isset($request->transaction) && !$transaction) {
-            request()->session()->flash('message', [
-                'content' => 'Transaction not found!',
-                'type' => 'error'
-            ]);
+            request()
+                ->session()
+                ->flash('message', [
+                    'content' => 'Transaction not found!',
+                    'type' => 'error',
+                ]);
         }
 
-        return Inertia::render('Transaction/TimeLine',
-            [
-                'transaction' => $transaction
-            ]
-        );
+        return Inertia::render('Transaction/TimeLine', [
+            'transaction' => $transaction,
+        ]);
     }
 
     public function confirmPaymentToReceiver(Request $request): array
@@ -62,16 +63,18 @@ class TransactionController extends Controller
 
         $transaction = Transaction::where('id', $transactionId)->first();
 
-        if (!$transaction) return ['status' => 'error'];
+        if (!$transaction) {
+            return ['status' => 'error'];
+        }
 
         $transaction->update([
             'status' => Transaction::PAYMENT_TO_RECEIVER_CONFIRMED,
-            'payment_to_receiver_confirmed_at' => Carbon::now()
+            'payment_to_receiver_confirmed_at' => Carbon::now(),
         ]);
 
         $transaction->oppositeTransaction()->update([
             'status' => Transaction::PAYMENT_TO_OPPOSITE_RECEIVER_CONFIRMED,
-            'payment_to_opposite_receiver_confirmed_at' => Carbon::now()
+            'payment_to_opposite_receiver_confirmed_at' => Carbon::now(),
         ]);
 
         $transaction->load('oppositeTransaction');
@@ -80,22 +83,14 @@ class TransactionController extends Controller
         if ($transaction->oppositeTransaction->type === Transaction::TYPE_DIRECT) {
             $this->collectFeesAndReleaseHold($transaction->oppositeTransaction);
 
-            Notify::transactionUpdated(
-                $transaction->oppositeTransaction->user,
-                $transaction->oppositeTransaction,
-                "Hi {$transaction->oppositeTransaction->user->first_name}, Your payment has been confirmed, money has been released to your card. Thank you for using 50-50!"
-            );
+            Notify::transactionUpdated($transaction->oppositeTransaction->user, $transaction->oppositeTransaction, "Hi {$transaction->oppositeTransaction->user->first_name}, Your payment has been confirmed, money has been released to your card. Thank you for using 50-50!");
 
             $transaction->update([
                 'status' => Transaction::TRANSACTION_COMPLETED,
                 'transaction_completed_at' => Carbon::now(),
             ]);
         } else {
-            Notify::transactionUpdated(
-                $transaction->oppositeTransaction->user,
-                $transaction->oppositeTransaction,
-                "Hi {$transaction->oppositeTransaction->user->first_name}, Your payment has been confirmed, payment to receiver is pending"
-            );
+            Notify::transactionUpdated($transaction->oppositeTransaction->user, $transaction->oppositeTransaction, "Hi {$transaction->oppositeTransaction->user->first_name}, Your payment has been confirmed, payment to receiver is pending");
         }
 
         return ['status' => 'success', 'transaction' => $transaction];
@@ -106,19 +101,18 @@ class TransactionController extends Controller
         $localPaymentIntent = $transaction->paymentIntent;
         $paymentIntent = Stripe::collectFeesAndReleaseHold($localPaymentIntent->stripe_payment_intent_id);
         if ($paymentIntent->status === 'succeeded') {
-
             $transaction->update([
                 'status' => Transaction::TRANSACTION_COMPLETED,
                 'transaction_completed_at' => Carbon::now(),
-                'payment_status' => Transaction::PAYMENT_FEES_CAPTURED
+                'payment_status' => Transaction::PAYMENT_FEES_CAPTURED,
             ]);
 
             $localPaymentIntent->update([
-                'status' => 'succeeded'
+                'status' => 'succeeded',
             ]);
 
             $transaction->post()->update([
-                'status' => Post::COMPLETED
+                'status' => Post::COMPLETED,
             ]);
         }
     }
