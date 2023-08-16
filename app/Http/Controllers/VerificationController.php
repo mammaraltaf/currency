@@ -24,6 +24,7 @@ class VerificationController extends Controller
 {
     public function verifyUserPage(): Response|FoundationResponse
     {
+
         $user = User::getUserFromSession();
         // $transactionInfo = User::getReceiverFromSession();
         if (!$user) {
