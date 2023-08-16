@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\GeoLocation;
 use App\Classes\Twilio;
 use App\Classes\UniqueNumberGenerator;
+use App\Http\Requests\GetBankRequest;
 use App\Http\Requests\UserInfoRequest;
 use App\Mail\EmailCodeGenerated;
 use App\Models\Commission;
@@ -56,13 +57,13 @@ class UsersController extends Controller
         ];
     }
 
-    public function getInternationalBanks(PaymentInformationRequest $request): array
+    public function getInternationalBanks(GetBankRequest $request): array
     {
         $countryCode = $request->country_code;
         $banks = Country::getCountryByCode($countryCode);
         return [
             'status' => 'success',
-            'banks' => $banks
+            'banks' => $banks->banks
         ];
     }
 
