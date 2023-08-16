@@ -56,7 +56,7 @@ const props = defineProps({
                 </FiftyText>
 
                 <Transition mode="out-in" name="fade">
-                    <SenderAndPayementInfoForm :user="user" :commissions="props.commissions" :receivingCountries="props.receivingCountries" :transactionId="props.transactionId" />
+                    <SenderAndPayementInfoForm :user="props.user" :commissions="props.commissions" :receivingCountries="props.receivingCountries" :transactionId="props.transactionId" />
                 </Transition>
 
             </div>

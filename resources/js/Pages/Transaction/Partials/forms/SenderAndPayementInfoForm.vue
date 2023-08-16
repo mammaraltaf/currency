@@ -46,6 +46,7 @@ const isLoadingCurrencyRate = ref(false);
 const currentRate = ref(0);
 const isTransactionPreset = ref(false);
 const totalAmount = ref(false)
+const bankOptions = ref([]);
 const user = reactive({
     'first_name': '',
     'country': geoLocationDetails.country_code,
@@ -55,17 +56,15 @@ const user = reactive({
     'amount': '',
     'amountTotal': '',
     'currency': currencies_countries[geoLocationDetails.country_code],
-    'receiver': {
-        'first_name': '',
-        'last_name': '',
-        'email': '',
-        'phone': '',
-        'receiver_country': '',
-        'bank_id': '',
-        'account_number': '',
-        'branch_number': '',
-        'banking_info': '',
-    },
+    'receiver_first_name': '',
+    'receiver_last_name': '',
+    'receiver_email': '',
+    'receiver_phone': '',
+    'receiver_country': '',
+    'receiver_bank_id': '',
+    'receiver_account_number': '',
+    'receiver_branch_number': '',
+    'receiver_banking_info': '',
     'flag': 'send_now',
 })
 const convertCurrencyByCountryCode = async () => {
@@ -134,12 +133,22 @@ function setTotal() {
 }
 const getBankList = async () => {
     api.startRequest();
-    let country = user.receiver.country
-    console.log('country',country);
+    let country = user.receiver_country
+    console.log('country', country);
     try {
-        const res = await axios.get('/api/get-international-banks/country_code?', { country });
-        if (res.data.status === 'success') {
-            console.log('res',res);
+        const res = await axios.get('/api/get-international-banks?country_code=' + country);
+        console.log('res.banks', res);
+        if (res.data.status == 'success') {
+            console.log('res.banks', res.banks);
+            res.data.banks.forEach(bank => {
+                bankOptions.value.push({
+                    'label': bank.label,
+                    'value': bank.id,
+                })
+            });
+            convertCurrencyByCountryCode()
+            // console.log('banks.value',bankOptions.value);
+            // return {bankOptions}
         }
     } catch (errors) {
         notification.notify('Something went wrong...', 'error');
@@ -210,18 +219,18 @@ const getBankList = async () => {
 
         <!-- start -->
         <div class="receiver-info-form-wrapper">
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.first_name" :errors="api.errors.value?.first_name"
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_first_name" :errors="api.errors.value?.receiver_first_name"
                 label="First Name" placeholder="John" required title="first_name" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.last_name" :errors="api.errors.value?.last_name"
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_last_name" :errors="api.errors.value?.receiver_last_name"
                 label="Last Name" placeholder="Doe" required title="last_name" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.email" :errors="api.errors.value?.email"
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_email" :errors="api.errors.value?.receiver_email"
                 label="Email" placeholder="john@example.com" title="email" />
             <InternationalTelInput :errors="api.errors.value?.phone" :required="false" label="Phone Number" title="phone"
                 class="fifty-form-input">
-                <vue-tel-input id="exampleFormControlInput1" ref="input" v-model="user.receiver.phone"
-                    :class="{ 'error-border': api.errors.value?.phone?.length > 0 }"
+                <vue-tel-input id="exampleFormControlInput1" ref="input" v-model="user.receiver_phone"
+                    :class="{ 'error-border': api.errors.value?.receiver_phone?.length > 0 }"
                     :inputOptions="{ 'placeholder': '123456789' }"
-                    :onlyCountries="isTransactionPreset ? [user.receiver.country] : []" class="form-control block w-full px-0 py-0 text-lg font-normal h-10
+                    :onlyCountries="isTransactionPreset ? [user.receiver_country] : []" class="form-control block w-full px-0 py-0 text-lg font-normal h-10
               text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition
               ease-linear m-0
               focus:text-gray-700 focus:bg-white focus:border-indigo-300 focus:outline-none" mode="international"
@@ -229,19 +238,19 @@ const getBankList = async () => {
 
                 </vue-tel-input>
             </InternationalTelInput>
-            <NewSelectInput class="fifty-form-input" v-model="user.receiver.country"
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver_country"
                 :errors="api.errors.value?.receiver_country" :options="countries" label="Country" placeholder="Country"
                 required title="country" type="text" @update:modelValue="getBankList" />
-            <NewSelectInput class="fifty-form-input" v-model="user.receiver.bank_id" :errors="api.errors.value?.bank_id"
-                :options="banks" label="International Bank" label-accessor="label" placeholder="International Bank" required
-                title="bank" type="text" value-accessor="id" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.account_number"
-                :errors="api.errors.value?.account_number" label="Account Number" placeholder="123456789" required
+            <NewSelectInput class="fifty-form-input" v-model="user.receiver_bank_id" :errors="api.errors.value?.receiver_bank_id"
+                :options="bankOptions" label="International Bank" label-accessor="label" placeholder="International Bank"
+                required title="bank" type="text" value-accessor="id" />
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_account_number"
+                :errors="api.errors.value?.receiver_account_number" label="Account Number" placeholder="123456789" required
                 title="account_number" />
-            <NewTextInput class="fifty-form-input" v-model="user.receiver.branch_number"
-                :errors="api.errors.value?.branch_number" label="Branch Number" placeholder="123456789"
+            <NewTextInput class="fifty-form-input" v-model="user.receiver_branch_number"
+                :errors="api.errors.value?.receiver_branch_number" label="Branch Number" placeholder="123456789"
                 title="branch_number" />
-            <NewTextArea v-model="user.receiver.banking_info" :errors="api.errors.value?.banking_info"
+            <NewTextArea v-model="user.receiver_banking_info" :errors="api.errors.value?.receiver_banking_info"
                 label="Additional Information / Comments" placeholder="I am open to different payment options..."
                 title="banking_info" />
 
