@@ -27,14 +27,8 @@ class TransactionController extends Controller
         if ($user->handlingTransaction()) {
             $user->handled_transaction = $user->getHandledTransaction();
         }
-        // THIS WILL BE UPDATED ACCORDINGLY IF THE USER IS COMPLETING A TRANSACTION OR CREATING A NEW ONE
-        //    COMPLETE TRANSACTION
+
         return Inertia::render('Transaction/TransactionInfo', ['user' => $user, 'receivingCountries' => Country::receivingCountries()]);
-        // SEND NOW
-        // return response()->json(['status' => 'success', 'user' => $user]);
-        //  return Inertia::render('Transaction/TransactionInfo',
-        //     ['user' => $user]
-        // );
     }
 
     public function trackTransactionPage(Request $request): Response
