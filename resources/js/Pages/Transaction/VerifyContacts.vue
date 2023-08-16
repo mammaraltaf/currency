@@ -47,13 +47,7 @@ const notificationStore = useNotificationStore();
 
 const continueToPayment = async () => {
     if (emailVerified.value) {
-        if (paramSource.value != '') {
             router.get('/transaction-info')
-
-        } else {
-            notificationStore.notify('Verified', 'success');
-        }
-
     } else {
         notificationStore.notify('Please verify your information first', 'error');
     }
@@ -61,13 +55,14 @@ const continueToPayment = async () => {
 
 const verifyUser = () => {
     emailVerified.value = true;
-    if (paramSource.value != '') {
-    currentStep.value = "transaction-info";
+    console.log('paramSource.value',paramSource.value);
+    if (paramSource.value != 'direct') {
+        currentStep.value = "transaction-info";
 
         continueToPayment();
 
     } else {
-    currentStep.value = "card-info";
+        currentStep.value = "card-info";
         openCardInfo()
 
     }

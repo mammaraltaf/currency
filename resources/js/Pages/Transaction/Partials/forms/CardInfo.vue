@@ -88,7 +88,7 @@ const user = reactive({
 });
 onMounted(() => {
     user.amount = props.user.amount;
-    user.country = props.user.receiver_country
+    user.country = props.user.country
 })
 console.log('user',user);
 const isModalOpened = ref(props.show);

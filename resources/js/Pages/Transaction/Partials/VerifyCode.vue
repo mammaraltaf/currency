@@ -31,6 +31,7 @@ const verifyEmailCode = async () => {
         const res = await axios.post('/api/verify-user', {
             code: verificationCode.value,
         });
+        console.log('res',res);
         if (res.data.status === 'valid') {
             isVerified.value = true;
             console.log('isVerified',isVerified.value);

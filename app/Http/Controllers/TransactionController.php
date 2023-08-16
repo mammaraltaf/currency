@@ -31,7 +31,7 @@ class TransactionController extends Controller
         //    COMPLETE TRANSACTION
         return Inertia::render('Transaction/TransactionInfo', ['user' => $user, 'receivingCountries' => Country::receivingCountries()]);
         // SEND NOW
-        return response()->json(['status' => 'success', 'user' => $user]);
+        // return response()->json(['status' => 'success', 'user' => $user]);
         //  return Inertia::render('Transaction/TransactionInfo',
         //     ['user' => $user]
         // );
