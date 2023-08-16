@@ -122,7 +122,9 @@ const cardInfoSubmit = async () => {
                 console.log('res',res);
 
         if (res.data.status === 'success') {
-            goForward('/receiver-info?payment-reference-identification=' + res.data.data.payment_intent_id + '&country=' + user.country);
+            goForward('/transaction-completed');
+
+            // goForward('/receiver-info?payment-reference-identification=' + res.data.data.payment_intent_id + '&country=' + user.country);
             notification.notify('Success', 'success');
             close(true);
 

@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/card-authorized', [CheckoutController::class, 'cardAuthorized'])->name('card.authorized.page');
     // thankyou message when the information is added
     // A ROUTE FOR THANKYOU MESSAGE IN CASE THE USER SENDS DIRECTLY WITHOUT POST
+    Route::get('/transaction-completed', [CheckoutController::class, 'cardAuthorized'])->name('transaction.completed.page');
+
 });
 
 
