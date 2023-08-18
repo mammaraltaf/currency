@@ -24,8 +24,8 @@ class GeoLocation
 
         $response = Http::get(config('services.geo_location.endpoint'), [
             'key' => config('services.geo_location.api_key'),
-            'ip' => request()->ip() === '127.0.0.1' ? '105.17.176.0' : request()->ip()
-            // MX: '132.247.0.0 // CA: 45.44.122.61 // SW: 105.17.176.0 // NG: 129.18.255.255
+            'ip' => request()->ip() === '127.0.0.1' ? '103.11.3.255' : request()->ip()
+            // MX: '132.247.0.0 // CA: 45.44.122.61 // SW: 105.17.176.0 // NG: 129.18.255.255 //PAK: 103.11.3.255
         ]);
 
         if ($response->successful()) {

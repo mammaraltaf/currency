@@ -41,20 +41,20 @@ class UsersController extends Controller
     #[ArrayShape(['status' => "string", 'user' => "\App\Http\Requests\UserInfoRequest"])]
     public function validateUserInfo(UserInfoRequest $userInfoRequest): array
     {
-//        if ($userInfoRequest->flag === 'send_now'){
-//            Receiver::create([
-//                'user_id' => auth()->id(),
-//                'bank_id' => $userInfoRequest->receiver_bank_id,
-//                'first_name' => $userInfoRequest->receiver_first_name,
-//                'last_name' => $userInfoRequest->receiver_last_name,
-//                'email' => $userInfoRequest->receiver_email,
-//                'phone' => $userInfoRequest->receiver_phone,
-//                'country' => $userInfoRequest->receiver_country,
-//                'account_number' => $userInfoRequest->receiver_account_number,
-//                'branch_number' => $userInfoRequest->receiver_branch_number,
-//                'banking_info' => $userInfoRequest->receiver_banking_info,
-//            ]);
-//        }
+        if ($userInfoRequest->flag === 'send_now'){
+            Receiver::create([
+                'user_id' => auth()->id() ?? User::latest()->first()->id,
+                'bank_id' => $userInfoRequest->receiver_bank_id,
+                'first_name' => $userInfoRequest->receiver_first_name,
+                'last_name' => $userInfoRequest->receiver_last_name,
+                'email' => $userInfoRequest->receiver_email,
+                'phone' => $userInfoRequest->receiver_phone,
+                'country' => $userInfoRequest->receiver_country,
+                'account_number' => $userInfoRequest->receiver_account_number,
+                'branch_number' => $userInfoRequest->receiver_branch_number,
+                'banking_info' => $userInfoRequest->receiver_banking_info,
+            ]);
+        }
 
         $verificationCode = UniqueNumberGenerator::generate();
 

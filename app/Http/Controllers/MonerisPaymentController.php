@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\CurrencyExchange;
+use App\Models\Country;
 use App\Models\PaymentIntent;
 use App\Models\Post;
 use App\Models\Transaction;
@@ -123,11 +125,24 @@ class MonerisPaymentController extends Controller
                 // Generate random stripe payment intent ID
                 $stripePaymentIntentId = rand(100000, 999999);
 
+                $receiverCountry = Country::where('code', $sessionData['receiver_country'])
+                    ->orWhere('code_iso_2', $sessionData['receiver_country'])
+                    ->first();
+
+                $requiredCurrency = $receiverCountry->currency->code;
+
+                if (!$requiredCurrency) {
+                    throw new \Exception('No currency found with the given code.');
+                }
+                $baseCurrency = $sessionData['currency'];
+                $amount_in_receiver_currency[] = CurrencyExchange::convertCurrencies($baseCurrency, $requiredCurrency);
+                $currencyValue = $amount_in_receiver_currency[0][$requiredCurrency]['value'] * $sessionData['amount'];
                 // Store Payment Intent Data
                 $paymentIntentData = [
                     'user_id' => $user->id,
                     'stripe_payment_intent_id' => $stripePaymentIntentId,
-                    'amount' => $sessionData['amount'],
+                    'amount' => $sessionData['amount'] * 100,
+                    'amount_in_receiver_currency' => $currencyValue * 100 ?? 1,
                     'currency' => $sessionData['currency'],
                     'status' => Post::AVAILABLE,
                 ];
