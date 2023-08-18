@@ -229,7 +229,7 @@ const getBankList = async () => {
                 title="last_name" />
             <NewTextInput class="fifty-form-input" v-model="user.receiver_email" :errors="api.errors.value?.receiver_email"
                 label="Email" placeholder="john@example.com" title="email" />
-            <InternationalTelInput :errors="api.errors.value?.phone" :required="false" label="Phone Number" title="phone"
+            <InternationalTelInput :errors="api.errors.value?.receiver_phone" :required="false" label="Phone Number" title="phone"
                 class="fifty-form-input">
                 <vue-tel-input id="exampleFormControlInput1" ref="input" v-model="user.receiver_phone"
                     :class="{ 'error-border': api.errors.value?.receiver_phone?.length > 0 }"
