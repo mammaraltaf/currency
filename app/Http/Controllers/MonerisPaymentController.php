@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\CurrencyExchange;
+use App\Classes\Notify;
 use App\Models\Country;
 use App\Models\PaymentIntent;
 use App\Models\Post;
@@ -175,8 +176,12 @@ class MonerisPaymentController extends Controller
                 $data = [
                     'payment_intent_id' => $paymentIntent->id,
                     'country' => $sessionData['country'],
-                    'transactionId' => $transactionId,
+//                    'transactionId' => $transactionId,
+                    'transactionId' => $transaction->id,
                 ];
+
+                /*Send Email*/
+                Notify::transactionUpdated($user, $transaction, "Hi {$transaction->user->first_name}, Your transaction has been initialized.");
 
                 DB::commit();
 
