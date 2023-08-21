@@ -124,7 +124,11 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function transactionCompleted(){
-        return Inertia::render('Transaction/CompleteTransaction');
+    public function transactionCompleted(Request $request){
+        $transactionId= $request->get('transactionId');
+        $data = [
+        'transactionId'=>$transactionId,
+    ];
+        return Inertia::render('Transaction/CompleteTransaction',['transactionId'=>$transactionId]);
     }
 }

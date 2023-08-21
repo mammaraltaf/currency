@@ -1,33 +1,38 @@
 <script setup>
-import {Head} from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import TransactionSteps from "@/Pages/Transaction/Partials/TransactionSteps.vue";
 import FiftyText from "@/Components/Design/FiftyText.vue";
 
 const props = defineProps({
-
+    transactionId: {
+        type:String,
+        default: null
+    }
 })
-
+console.log('transactionId',props.transactionId);
 
 </script>
 
 <template>
     <GuestLayout>
+
         <Head title="Fifty-Fifty | Send Money">
             <title>
-                Fifty-Fifty | Transaction Completed
+                Fifty-Fifty |Transaction Completed !
             </title>
         </Head>
 
         <div class="transaction-step-wrapper">
             <div class="transaction-step">
-                <TransactionSteps current-step="thank-you" />
+                <TransactionSteps current-step="completed" />
 
                 <FiftyText variation="heading-3">
-                    Transaction Completed !
+
+                    Transaction Id: {{ transactionId }}
                 </FiftyText>
                 <FiftyText variation="heading-4">
-                    Thank You for chosing Fifty-Fifty for services
+                    Your post is created
                 </FiftyText>
 
             </div>

@@ -119,10 +119,10 @@ const cardInfoSubmit = async () => {
     try {
         console.log('user', user);
         const res = await axios.post('/moneris', user);
-                console.log('res',res);
+                console.log('res.data.data.transactionId',res.data.data.transactionId);
 
         if (res.data.status === 'success') {
-            goForward('/transaction-completed');
+            goForward('/transaction-completed?transactionId='+res.data.data.transactionId);
 
             // goForward('/receiver-info?payment-reference-identification=' + res.data.data.payment_intent_id + '&country=' + user.country);
             notification.notify('Success', 'success');
@@ -189,7 +189,7 @@ function checkCardNo(){
                         Cancel
                     </button>
 
-                    <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn" />
+                    <!-- <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn" /> -->
                 </div>
 
             </template>
