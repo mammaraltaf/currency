@@ -104,7 +104,7 @@ const toggleSidebar = () => {
                     title="Global Variables"
                 />
                 <SidebarElement
-                    icon="timer"
+                    icon="money"
                     route-name="commission.page"
                     title="Commission"
                 />

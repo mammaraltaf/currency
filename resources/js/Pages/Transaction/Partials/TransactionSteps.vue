@@ -14,7 +14,7 @@ const steps = {
     'verify-contacts': 2,
     'transaction-info': 2,
     'receiver-info': 3,
-    'thank-you': 4,
+    'completed': 4,
     'card-info': 3,
     'card-info': 4,
 };
@@ -47,7 +47,7 @@ const completedSteps = computed( () => {
                     {{ currentStep.replace('-', ' ')}}
                 </div>
             </li>
-            <li :class="{'current': currentStep === 'thank-you'|| currentStep === 'card-info', 'completed': completedSteps > 4}">
+            <li :class="{'current': currentStep === 'completed'|| currentStep === 'card-info', 'completed': completedSteps > 4}">
                 <span class="step-icon"></span>
                 <div class="step-text">
                     {{ currentStep.replace('-', ' ')}}

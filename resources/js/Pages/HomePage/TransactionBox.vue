@@ -62,9 +62,9 @@ const convertCurrencyByCountryCode = async () => {
 const amountChanged = () => {
     errors.amount = [];
 
-    if(transactionDetails.amount >= 100000){
-        transactionDetails.amount = 100000;
-        return errors.amount = ['100,000 is the maximum amount']
+    if(transactionDetails.amount >= 1000){
+        transactionDetails.amount = 1000;
+        return errors.amount = ['1000 is the maximum amount']
     }
 
     transactionDetails.convertedAmount = getConvertedAmount();
@@ -73,9 +73,9 @@ const amountChanged = () => {
 const convertAmountChanged = () => {
     errors.convertedAmount = [];
 
-    if(transactionDetails.convertedAmount >= 100000){
-        transactionDetails.convertedAmount = 100000;
-        return errors.convertedAmount = ['100,000 is the maximum amount']
+    if(transactionDetails.convertedAmount >= 1000){
+        transactionDetails.convertedAmount = 1000;
+        return errors.convertedAmount = ['1000 is the maximum amount']
     }
 
     transactionDetails.amount = getAmount();
@@ -107,7 +107,7 @@ const getAmount = () => {
                 :info="geoLocationDetails.country.currency.code"
                 label="Your amount"
                 placeholder="Amount to send"
-                :max="100000"
+                :max="1000"
                 :min="10"
                 required
                 type="number"
@@ -138,14 +138,14 @@ const getAmount = () => {
                 label="Receiver gets"
                 placeholder="Amount received"
                 required
-                :max="100000"
+                :max="1000"
                 :min="10"
                 type="number"
                 title="convertedAmount"
                 @update:modelValue="convertAmountChanged"
             />
 
-            <NewActionButton :url="route('user.info.page')" class="custom-action-btn" title="Get Started"/>
+            <NewActionButton :url="route('user.info.page',[transactionDetails.country,transactionDetails.amount,transactionDetails.convertedAmount])" class="custom-action-btn" title="Get Started"/>
         </div>
 
 
