@@ -8,6 +8,21 @@ import FiftyText from "@/Components/Design/FiftyText.vue";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
 import SuccessIcon from "@/Components/Custom/SuccessIcon.vue";
 
+const downloadPDF = (pdf) => {
+    const pdfUrl = pdf;
+    window.open(pdfUrl, '_blank');
+};
+
+
+function checkExt(path) {
+    let flag = false;
+    const parts = path.split('.');
+    if (parts[1] === 'pdf') {
+        flag = true
+    }
+    return flag
+}
+
 const props = defineProps({
     transaction: {
         type: Object,
@@ -89,8 +104,18 @@ const confirmPaymentToReceiver = async () => {
                 <template #content>
 
                     <div class="p-6">
-                        <img :src="`${transaction.opposite_transaction?.payment_intent.payment_proof}`"
-                             alt="proof of payment">
+                        <!--                        <img :src="`${transaction.opposite_transaction?.payment_intent.payment_proof}`"-->
+                        <!--                             alt="proof of payment">-->
+
+                        <div v-if="checkExt(`${transaction.opposite_transaction?.payment_intent.payment_proof}`)">
+                            <a @click="downloadPDF(`${transaction.opposite_transaction?.payment_intent.payment_proof}`)"
+                               href="#">Download PDF</a>
+                        </div>
+                        <div v-else>
+                            <img :src="`${transaction.opposite_transaction?.payment_intent.payment_proof}`"
+                                 alt="proof of payment">
+                        </div>
+
                     </div>
 
                 </template>
@@ -98,7 +123,7 @@ const confirmPaymentToReceiver = async () => {
             </Modal>
 
             <div class="confirmed-button" v-if="transactionStatuses[transaction.status] > 5">
-                <SuccessIcon class="icon" />
+                <SuccessIcon class="icon"/>
                 Payment Confirmed
             </div>
 
