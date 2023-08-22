@@ -7,6 +7,7 @@ use App\Classes\Notify;
 use App\Models\Country;
 use App\Models\PaymentIntent;
 use App\Models\Post;
+use App\Models\Receiver;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -109,7 +110,6 @@ class MonerisPaymentController extends Controller
             if ($response->isSuccessful()) {
                 $transactionId = $response->getTransactionReference();
                 $sessionData = User::getUserFromSession();
-
                 DB::beginTransaction();
 
                 // Create or update user
@@ -151,9 +151,13 @@ class MonerisPaymentController extends Controller
                 // Create Payment Intent and associate with user
                 $paymentIntent = $user->paymentIntents()->create($paymentIntentData);
 
+                $receiverId = Receiver::where('email', $sessionData['receiver_email'])
+                                        ->where('phone', $sessionData['receiver_phone'])
+                                        ->first()->id;
+
                 // Store Transaction Data
                 $transactionData = [
-                    'receiver_id' => 1,
+                    'receiver_id' => $receiverId ?? 1,
                     'payment_intent_id' => $paymentIntent->id,
                     'type' => 'direct',
                     'status' => Transaction::PAIRING_PENDING,

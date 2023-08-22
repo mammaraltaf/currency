@@ -53,6 +53,7 @@ class UsersController extends Controller
                 'account_number' => $userInfoRequest->receiver_account_number,
                 'branch_number' => $userInfoRequest->receiver_branch_number,
                 'banking_info' => $userInfoRequest->receiver_banking_info,
+                'type'=> $userInfoRequest->type,
             ]);
         }
 
