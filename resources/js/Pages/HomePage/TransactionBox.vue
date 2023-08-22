@@ -8,6 +8,7 @@ import NewActionButton from "@/Components/Design/NewActionButton.vue";
 import {usePage} from "@inertiajs/vue3";
 import {useNotificationStore} from "@/stores/notification";
 import {currencies_countries} from "@/helpers/currencies_countries";
+import { router } from '@inertiajs/vue3'
 
 const api = useAPI();
 const notification = useNotificationStore();
@@ -88,7 +89,10 @@ const getConvertedAmount = () => {
 const getAmount = () => {
     return parseFloat((transactionDetails.convertedAmount / currentRate.value).toFixed(2));
 }
-
+function getStarted(){
+    // route('user.info.page',[transactionDetails.country,,transactionDetails.convertedAmount])
+   return router.visit(`/user-info?receiver_country=${transactionDetails.country}&receiver_gets=${transactionDetails.convertedAmount}&amount=${transactionDetails.amount}`);
+}
 </script>
 
 
@@ -145,7 +149,7 @@ const getAmount = () => {
                 @update:modelValue="convertAmountChanged"
             />
 
-            <NewActionButton :url="route('user.info.page',[transactionDetails.country,transactionDetails.amount,transactionDetails.convertedAmount])" class="custom-action-btn" title="Get Started"/>
+            <NewActionButton @click="getStarted()" class="custom-action-btn" title="Get Started"/>
         </div>
 
 

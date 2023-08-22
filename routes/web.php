@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
 
 
 // User data (authentication of user) - public routes
-Route::get('/user-info/{receiver_country?}/{amount?}/{receiver_gets?}', [UsersController::class, 'userInfoPage'])->name('user.info.page');
+Route::get('/user-info', [UsersController::class, 'userInfoPage'])->name('user.info.page');
 Route::get('/verify-contacts', [VerificationController::class, 'verifyUserPage'])->name('verify.user.page');
 
 
