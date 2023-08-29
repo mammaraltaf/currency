@@ -10,7 +10,7 @@ import { currencies_countries } from "@/helpers/currencies_countries";
 import { currencies } from "@/helpers/currencies";
 import { useNotificationStore } from "@/stores/notification";
 import NewTextInput from "@/Components/Design/NewTextInput.vue";
-import ToggleSwitch from "@/Components/Custom/ToggleSwitch.vue";
+import RadioButton from "@/Components/Custom/RadioButton.vue";
 import NewSelectInput from "@/Components/Design/NewSelectInput.vue";
 import FiftyText from "@/Components/Design/FiftyText.vue";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
@@ -195,15 +195,19 @@ onMounted(() => {
     }
 });
 const updateOptions = () => {
-    if (user.type == 'bank') {
-        user.type = 'transfer';
+    // console.log('before type', user.type);
 
-    } else {
-        user.type = 'bank';
-    }
-    console.log('type', user.type);
-
+    // if (user.type == 'bank') {
+    //     user.type = 'transfer';
+    // } else {
+    //     user.type = 'bank';
+    // }
+    // console.log('after type', user.type);
 }
+const radioOptions = [
+  { label: 'Bank', value: 'bank' },
+  { label: 'E-Money/Transfer', value: 'transfer' },
+];
 </script>
 
 <template>
@@ -279,17 +283,17 @@ const updateOptions = () => {
             <NewSelectInput class="fifty-form-input" v-model="user.receiver_country"
                 :errors="api.errors.value?.receiver_country" :options="countries" label="Country" placeholder="Country"
                 required title="country" type="text" @update:modelValue="getBankList" />
-            <ToggleSwitch v-model="user.type" label="Type" :beforeSwitch="'Bank '" :afterSwitch="'E-Money/Transfer'"
-                @update:modelValue="updateOptions" />
-                <NewSelectInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_bank_id"
-                    :errors="api.errors.value?.receiver_bank_id" :options="bankOptions" label="International Bank"
-                    placeholder="International Bank" required title="bank" type="text" />
-                <NewTextInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_account_number"
-                    :errors="api.errors.value?.receiver_account_number" label="Account Number" placeholder="123456789"
-                    required title="account_number" />
-                <NewTextInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_branch_number"
-                    :errors="api.errors.value?.receiver_branch_number" label="Branch Number" placeholder="123456789"
-                    title="branch_number" />
+
+            <RadioButton v-model="user.type" :title="'Type'" :label="'Type'" :options="radioOptions" @update:modelValue="updateOptions" />
+            <NewSelectInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_bank_id"
+                :errors="api.errors.value?.receiver_bank_id" :options="bankOptions" label="International Bank"
+                placeholder="International Bank" required title="bank" type="text" />
+            <NewTextInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_account_number"
+                :errors="api.errors.value?.receiver_account_number" label="Account Number" placeholder="123456789" required
+                title="account_number" />
+            <NewTextInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_branch_number"
+                :errors="api.errors.value?.receiver_branch_number" label="Branch Number" placeholder="123456789"
+                title="branch_number" />
 
             <NewTextArea v-model="user.receiver_banking_info" :errors="api.errors.value?.receiver_banking_info"
                 label="Additional Information / Comments" placeholder="I am open to different payment options..."
