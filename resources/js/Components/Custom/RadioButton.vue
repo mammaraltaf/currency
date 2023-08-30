@@ -44,7 +44,7 @@ const proxyChecked = computed({
 </script>
 
 <template>
-    <div class=" fifty-form-input">
+    <div class="w-full flex flex-col justify-start relative fifty-form-input">
         <!-- <input type="radio" id="css" name="fav_language" value="CSS"> -->
         <!-- <input type="radio" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"> -->
         <label :for="title" class="w-fit inline-block mb-2">
