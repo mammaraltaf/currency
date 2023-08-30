@@ -280,11 +280,12 @@ const radioOptions = [
 
                 </vue-tel-input>
             </InternationalTelInput>
+            <RadioButton v-model="user.type" :customStyle="{width: 'inherit'}" :title="'Type'" :label="'Type'" :options="radioOptions" @update:modelValue="updateOptions" />
+
             <NewSelectInput class="fifty-form-input" v-model="user.receiver_country"
                 :errors="api.errors.value?.receiver_country" :options="countries" label="Country" placeholder="Country"
                 required title="country" type="text" @update:modelValue="getBankList" />
 
-            <RadioButton v-model="user.type" :title="'Type'" :label="'Type'" :options="radioOptions" @update:modelValue="updateOptions" />
             <NewSelectInput v-if="user.type == 'bank'" class="fifty-form-input" v-model="user.receiver_bank_id"
                 :errors="api.errors.value?.receiver_bank_id" :options="bankOptions" label="International Bank"
                 placeholder="International Bank" required title="bank" type="text" />

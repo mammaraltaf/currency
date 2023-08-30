@@ -29,6 +29,11 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    customStyle: {
+        type:Object,
+        default:'',
+    }, // This prop will accept a style object
+
 });
 
 const selectedOption = ref(props.options[0].value);
@@ -44,7 +49,7 @@ const proxyChecked = computed({
 </script>
 
 <template>
-    <div class="w-full flex flex-col justify-start relative fifty-form-input">
+    <div class="w-full flex flex-col justify-start relative fifty-form-input" :style="customStyle">
         <!-- <input type="radio" id="css" name="fav_language" value="CSS"> -->
         <!-- <input type="radio" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)"> -->
         <label :for="title" class="w-fit inline-block mb-2">
