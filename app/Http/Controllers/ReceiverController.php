@@ -117,4 +117,16 @@ class ReceiverController extends Controller
             'status' => 'error'
         ];
     }
+
+
+    public function getInternationalBanks(Request $request): array
+    {
+        $receiverCountry = Country::getCountryByCode(request('country'));
+
+        return [
+            'status' => 'success',
+            'banks' => $receiverCountry->banks
+        ];
+
+    }
 }

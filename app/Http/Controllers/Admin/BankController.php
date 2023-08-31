@@ -12,30 +12,41 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
 
-
 class BankController extends Controller
 {
     public function index(Request $request): Response
     {
-        $sort =  $request->get('column')?$request->get('column') : 'id';
-        $sortType =$request->get('type')?$request->get('type') : 'asc';
+        $query = Bank::whereNotNull('country_id');
+        $sort = $request->get('column')!=null? $request->get('column') : 'id';
+        $sortType =$request->get('type')!=null? $request->get('type') : 'asc';
         if ($sort != 'country') {
-
-            $query = Bank::orderBy($sort, $sortType);
+            $query = $query->orderBy($sort, $sortType);
         } else {
-            $query = Bank::join('countries', 'banks.country_id', '=', 'countries.id')
+            $query = $query->join('countries', 'banks.country_id', '=', 'countries.id')
                 ->orderBy('countries.label', $sortType)
                 ->select('banks.*');
         }
+        if (request()->has('q') && !empty(request('q'))) {
+            $search = request('q');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery
+                    ->whereHas('country', function ($countryQuery) use ($search) {
+                        $countryQuery->where('label', 'like', '%' . $search . '%');
+                    })
+                    ->orWhere('label', 'like', '%' . $search . '%');
+            });
+        }
 
-        $banks = $query->paginate(25);
+        $banks = $query->paginate(50);
+
         return Inertia::render('Admin/Banks/Index', [
             'banks' => $banks,
             'countries' => Country::supportedCountries(),
         ]);
     }
 
-    public function store(StoreBankRequest $request){
+    public function store(StoreBankRequest $request)
+    {
         return Bank::create($request->validated());
     }
 
@@ -46,11 +57,10 @@ class BankController extends Controller
 
     public function delete(DeleteBankRequest $request, Bank $bank): array|bool
     {
-        if($bank->delete()){
+        if ($bank->delete()) {
             return ['id' => $bank->id];
         }
 
         return false;
     }
-
 }

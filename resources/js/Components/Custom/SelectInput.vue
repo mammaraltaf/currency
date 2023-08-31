@@ -43,9 +43,12 @@ defineProps({
     options: {
         type: Array,
         required: true
+    },
+    'selected':{
+        type: String,
+        default: null,
     }
 });
-
 defineEmits(['update:modelValue']);
 
 const input = ref(null);
@@ -77,7 +80,7 @@ defineExpose({focus: () => input.value.focus()});
             @change="$emit('update:modelValue', $event.target.value)"
         >
             <option class="bg-gray-200" disabled value="">--{{ placeholder }}--</option>
-            <option v-for="option in options" :key="option[valueAccessor]" :value="option[valueAccessor]">
+            <option v-for="option in options" :key="option[valueAccessor]" :value="option[valueAccessor]" :selected="option[valueAccessor]==selected?'selected':''">
                 {{ option[labelAccessor] }}
             </option>
         </select>

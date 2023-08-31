@@ -25,30 +25,14 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'first_name',
-        'last_name',
-        'phone',
-        'email',
-        'country',
-        'ip_address',
-        'transaction_id',
-        'email_verified_at',
-        'phone_verified_at',
-        'auth_method',
-        'password'
-    ];
+    protected $fillable = ['name', 'first_name', 'last_name', 'phone', 'email', 'country', 'ip_address', 'transaction_id', 'email_verified_at', 'phone_verified_at', 'auth_method', 'password'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected $appends = ['role', 'can_access_admin'];
 
@@ -64,14 +48,22 @@ class User extends Authenticatable
 
     public static function getUserFromSession()
     {
-        return session("current_user_" . request()->ip());
+        return session('current_user_' . request()->ip());
     }
 
     public static function putUserIntoSession($user)
     {
-        session()->put(["current_user_" . request()->ip() => $user]);
+        session()->put(['current_user_' . request()->ip() => $user]);
     }
+    // public static function getReceiverFromSession()
+    // {
+    //     return session('current_receiver_' . request()->ip());
+    // }
 
+    // public static function putReceiverIntoSession($user)
+    // {
+    //     session()->put(['current_receiver_' . request()->ip() => $user]);
+    // }
     // Attributes
     public function getNameAttribute()
     {
@@ -92,7 +84,9 @@ class User extends Authenticatable
     {
         $now = Carbon::now();
 
-        if ($now->diffInMinutes($verifiedAt) > env('SESSION_LIFETIME')) return null;
+        if ($now->diffInMinutes($verifiedAt) > env('SESSION_LIFETIME')) {
+            return null;
+        }
 
         return $verifiedAt;
     }
@@ -106,7 +100,9 @@ class User extends Authenticatable
     {
         $now = Carbon::now();
 
-        if ($now->diffInMinutes($verifiedAt) > env('SESSION_LIFETIME')) return null;
+        if ($now->diffInMinutes($verifiedAt) > env('SESSION_LIFETIME')) {
+            return null;
+        }
 
         return $verifiedAt;
     }
@@ -119,7 +115,9 @@ class User extends Authenticatable
 
     public function getHandledTransaction(): Model|null
     {
-        return Transaction::with('user:id,country')->where('id', $this->transaction_id)->first();
+        return Transaction::with('user:id,country')
+            ->where('id', $this->transaction_id)
+            ->first();
     }
 
     /* Relations */

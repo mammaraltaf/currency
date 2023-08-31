@@ -13,8 +13,8 @@ class ReceiverController extends Controller
 
     public function receiversPage(Request $request): Response
     {
-        $columnName = $request->get('column')?$request->get('column'):'created_at';
-        $columnType = $request->get('type')?$request->get('type'):'desc';
+        $columnName = $request->get('column')!=null?$request->get('column'):'created_at';
+        $columnType = $request->get('type')!=null?$request->get('type'):'desc';
         if ($columnName != 'label') {
             $query = Receiver::orderBy($columnName,$columnType);
         } else {
@@ -22,9 +22,21 @@ class ReceiverController extends Controller
                 ->orderBy('banks.label', $columnType)
                 ->select('receivers.*');
         }
-        $receivers = $query->paginate(25);
+        if (request()->has('q') && !empty(request('q')))  {
+            $search = request('q');
+            $query->where(function ($innerQuery) use ($search) {
+                $innerQuery->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('country', 'like', '%' . $search . '%');
+            });
+        }
+
+        $receivers = $query->paginate(5);
+
         return Inertia::render('Admin/Receivers/Index', [
-            'receivers' => $receivers
+            'receivers' =>$receivers
         ]);
     }
 

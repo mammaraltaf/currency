@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ReceiverController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\CommissionController;
+use App\Http\Controllers\UpdateStatusController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,8 +22,13 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     Route::get('/admin/transactions', [TransactionController::class, 'transactionsPage'])->name('transactions.page');
     Route::get('/admin/transactions/payment-intent/{paymentIntent}', [TransactionController::class, 'paymentIntentPage'])->name('payment.intent.page');
 
-    // transactions
+    // Post
     Route::get('/admin/posts', [PostController::class, 'postsPage'])->name('posts.page');
+    Route::post('/admin/posts/store', [PostController::class, 'store'])->name('posts.store');
+    Route::post('/admin/posts/refresh/{post}', [PostController::class, 'refresh'])->name('posts.refresh');
+    Route::put('/admin/posts/update/{post}', [PostController::class, 'update'])->name('posts.refresh');
+    Route::delete('/admin/posts/delete/{post}', [PostController::class, 'delete'])->name('posts.delete');
+    // UPDATE ROUTE MISSING
 
     // banks
     Route::get('/admin/banks', [BankController::class, 'index'])->name('banks.page');
@@ -39,6 +46,7 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // countries
     Route::get('/admin/countries', [CountriesController::class, 'countriesPage'])->name('countries.page');
     Route::post('/admin/countries/store', [CountriesController::class, 'store'])->name('countries.store');
+    Route::put('/admin/countries/update/{country}', [CountriesController::class, 'update'])->name('countries.update');
 
 
     // users
@@ -48,4 +56,13 @@ Route::middleware(['auth', 'can:access.admin.panel'])->group(function () {
     // receivers
     Route::get('/admin/receivers', [ReceiverController::class, 'receiversPage'])->name('receivers.page');
     Route::get('/admin/receivers/{receiver}', [ReceiverController::class, 'singleReceiverPage'])->name('single.receiver.page');
+
+    Route::get('/admin/update-status-time', [UpdateStatusController::class, 'index'])->name('time.page');
+    Route::post('/admin/update-status-time', [UpdateStatusController::class, 'store'])->name('update.status.store');
+    Route::put('/admin/update-status-time/{updateStatusTime}', [UpdateStatusController::class, 'update'])->name('update.status.update');
+
+
+    Route::get('/admin/commission', [CommissionController::class, 'commissionPage'])->name('commission.page');
+    Route::put('/admin/commission/{commission}', [CommissionController::class, 'updateCommission'])->name('commission.update');
+
 });

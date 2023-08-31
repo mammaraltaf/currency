@@ -22,7 +22,8 @@ class Receiver extends Model
         'bank_id',
         'account_number',
         'branch_number',
-        'banking_info'
+        'banking_info',
+        'type'
     ];
 
     protected $with = ['bank'];

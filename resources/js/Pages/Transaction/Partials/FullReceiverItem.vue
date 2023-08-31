@@ -39,7 +39,7 @@ const props = defineProps({
             </FiftyText>
 
             <FiftyText>
-                bank: <b> {{ receiver.bank.label }}</b>
+                bank: <b> {{ receiver?.bank?.label }}</b>
             </FiftyText>
 
             <FiftyText>

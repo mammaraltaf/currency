@@ -123,4 +123,12 @@ class CheckoutController extends Controller
             'payment_status' => Transaction::PAYMENT_ON_HOLD
         ]);
     }
+
+    public function transactionCompleted(Request $request){
+        $transactionId= $request->get('transactionId');
+        $data = [
+        'transactionId'=>$transactionId,
+    ];
+        return Inertia::render('Transaction/CompleteTransaction',['transactionId'=>$transactionId]);
+    }
 }

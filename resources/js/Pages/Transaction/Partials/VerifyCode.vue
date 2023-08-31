@@ -18,7 +18,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['verified'])
-const isVerified = ref(!!props.user.email_verified_at || !!props.user.phone_verified_at)
+let isVerified = ref(!!props.user.email_verified_at || !!props.user.phone_verified_at)
 const verificationCode = ref('');
 
 // Notification:
@@ -27,16 +27,18 @@ const notificationStore = useNotificationStore();
 
 const verifyEmailCode = async () => {
     api.startRequest();
-
     try {
         const res = await axios.post('/api/verify-user', {
             code: verificationCode.value,
         });
-
+        console.log('res',res);
         if (res.data.status === 'valid') {
-            emit('verified');
             isVerified.value = true;
+            console.log('isVerified',isVerified.value);
             notificationStore.notify('Verified', 'success');
+            emit('verified');
+
+
         } else {
             api.errors.value.verificationCode = ['Invalid code'];
             notificationStore.notify('Invalid code', 'error');
@@ -84,6 +86,7 @@ const verifyEmailCode = async () => {
             <NewActionButton
                 title="Verify"
                 :isLoading="api.isLoading.value"
+                :disabled="isVerified==true?'disabled':''"
                 @click="verifyEmailCode"
             />
         </div>

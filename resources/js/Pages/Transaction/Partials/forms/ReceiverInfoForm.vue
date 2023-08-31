@@ -104,7 +104,7 @@ const setReceiverValues = () => {
 
 onMounted(() => {
     paymentIntentID.value = helpers.getURLParam('payment-reference-identification');
-
+    console.log('paymentIntentID.value',paymentIntentID.value);
     const paramCountry = helpers.getURLParam('country');
 
     console.log(paramCountry);

@@ -37,23 +37,24 @@ const openModal = () => {
 const emit = defineEmits(['close'])
 
 function close(isFetchData) {
-    console.log('this s iedit',isFetchData);
+    console.log('this s iedit', isFetchData);
     emit("close", isFetchData);
 }
 const applyEdit = async () => {
     api.startRequest();
-    console.log('currencyData', props.currencyData.value);
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     // Set the CSRF token as a default header for all Axios requests
     axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
-    console.log('csrfToken', csrfToken);
     try {
         const res = await axios.put('/admin/currencies/update/' + props.currencyData.value.id, props.currencyData.value)
-
         if (res.data) {
+            console.log('res', res);
+            let data = props.currencyData.value
+            console.log('data', data);
+
             notification.notify('Currency updated', 'success');
             endEdit();
-            close(currencyData.value);
+            close(props.currencyData.value);
         }
     } catch (errors) {
         console.log('errors', errors);
@@ -66,7 +67,7 @@ const applyEdit = async () => {
 
 const endEdit = () => {
     api.errors.value = {};
-    currencyData.value = {};
+    // currencyData.value = {};
 }
 </script>
 
@@ -108,7 +109,7 @@ const endEdit = () => {
                             Cancel
                         </button>
 
-                        <!-- <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn" /> -->
+                        <Spinner v-if="api.isLoading.value" class="button-spinner-center action-btn" />
                     </div>
 
                 </form>
