@@ -37,7 +37,7 @@ console.log(props.banks);
                 <TransactionSteps current-step="receiver-info" />
 
                 <FiftyText variation="heading-3">
-                    Enter Receiver Information
+                    Enter Receiver Information 
                 </FiftyText>
 
                 <transition mode="out-in" name="fade">
