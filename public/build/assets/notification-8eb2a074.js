@@ -1,0 +1,1 @@
+import{B as e}from"./app-dde26467.js";const o=e("notification",{state:()=>({isShown:!1,type:"",message:""}),actions:{notify(t,s){this.isShown=!0,this.type=s,this.message=t,setTimeout(()=>{this.isShown=!1},5e3)}}});export{o as u};

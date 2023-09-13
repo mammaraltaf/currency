@@ -1,0 +1,3 @@
+import{_ as n}from"./AdminLayout-f2e9409d.js";import{c as o,a as t,w as e,u as s,F as l,o as m,Z as i,b as a}from"./app-dde26467.js";import"./ResponsiveNavLink-7e84a44d.js";import"./notification-8eb2a074.js";import"./FlashMessage-95844240.js";import"./CustomSidebar-f7543e53.js";import"./SidebarElement-9f0fe621.js";import"./_plugin-vue_export-helper-c27b6911.js";const r=a("title",null,`
+            Admin panel
+        `,-1),_=a("div",{class:"mt-16 ml-16 text-xl"}," Welcome to admin panel.. ",-1),c={name:"AdminPanel"},w=Object.assign(c,{setup(p){return(d,u)=>(m(),o(l,null,[t(s(i),{title:"Admin panel"},{default:e(()=>[r]),_:1}),t(n,null,{default:e(()=>[_]),_:1})],64))}});export{w as default};
