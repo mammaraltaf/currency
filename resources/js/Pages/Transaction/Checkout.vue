@@ -1,6 +1,6 @@
 <script setup>
-import {Head} from '@inertiajs/vue3';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import { Head } from "@inertiajs/vue3";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 import CardDetailsForm from "@/Pages/Transaction/Partials/forms/CardDetailsForm.vue";
 import PaymentProof from "@/Pages/Transaction/Partials/PaymentProof.vue";
 import FiftyText from "@/Components/Design/FiftyText.vue";
@@ -10,36 +10,30 @@ const props = defineProps({
     user: {
         default: null,
         type: Object,
-        required: true
+        required: true,
     },
     paymentIntent: {
         default: null,
-        type: Object
+        type: Object,
     },
     stripeConfig: {
         default: null,
-        type: Object
-    }
-})
-
-
+        type: Object,
+    },
+});
 </script>
 
 <template>
     <GuestLayout>
         <Head title="Fifty-Fifty | Send Money">
-            <title>
-                Fifty-Fifty | Make Payment
-            </title>
+            <title>Fifty-Fifty | Make Payment</title>
         </Head>
 
         <div class="transaction-step-wrapper">
             <div class="transaction-step">
                 <TransactionSteps current-step="card-info" />
 
-                <FiftyText variation="heading-3">
-                    Card Details
-                </FiftyText>
+                <FiftyText variation="heading-3"> Card Details </FiftyText>
 
                 <transition mode="out-in" name="fade">
                     <PaymentProof
@@ -48,7 +42,11 @@ const props = defineProps({
                         :user="props.user"
                     />
 
-                    <CardDetailsForm v-else :paymentIntent="paymentIntent" :stripeConfig="stripeConfig"/>
+                    <CardDetailsForm
+                        v-else
+                        :paymentIntent="paymentIntent"
+                        :stripeConfig="stripeConfig"
+                    />
                 </transition>
             </div>
         </div>
@@ -57,6 +55,6 @@ const props = defineProps({
 
 <script>
 export default {
-    name: 'Payment'
-}
+    name: "Payment",
+};
 </script>

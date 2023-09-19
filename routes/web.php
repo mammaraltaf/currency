@@ -28,7 +28,7 @@ use App\Http\Controllers\MonerisPaymentController;
 |
 */
 /*tesing moneris*/
-Route::post('/moneris',[MonerisPaymentController::class,'payment'])->name('moneris.payment');
+// Route::post('/moneris',[MonerisPaymentController::class,'payment'])->name('moneris.payment');
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
 Route::get('/services', [DashboardController::class, 'services'])->name('services.page');
 Route::get('/not-supported', [ErrorsController::class, 'notSupported'])->name('not.supported.page');

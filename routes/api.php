@@ -10,6 +10,7 @@ use App\Http\Controllers\OppositeSenderController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\MobileAPI\VerificationController;
+use App\Http\Controllers\MonerisPaymentController;
 use App\Http\Controllers\ReceiverController;
 use App\Http\Middleware\MakeSureSignatureIsValid;
 use Illuminate\Http\Request;
@@ -27,32 +28,35 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+/*tesing moneris*/
+
+Route::post('/moneris', [MonerisPaymentController::class, 'monerisPayment'])->name('moneris.payment');
 // Transaction:
 // step one: submit user info
 // Public with token:
 Route::middleware(MakeSureSignatureIsValid::class)->group(function () {
-// Auth user
+    // Auth user
     Route::post('/user/info',  [VerificationController::class, 'info'])->name('info');
     Route::post('/user/verify',  [VerificationController::class, 'verify'])->name('verify');
 
-// Countries:
+    // Countries:
     Route::get('/countries/supported', [CountryController::class, 'supportedCountries'])->name('get.supported.countries');
 
-// Currencies:
+    // Currencies:
     Route::post('/currencies/convert', [CurrencyController::class, 'convertCurrency'])->name('app.convert.currency');
     Route::get('/currencies/popular', [CurrencyController::class, 'popular'])->name('app.convert.currency');
 
-// Posts:
+    // Posts:
     Route::get('/posts/available', [PostController::class, 'index'])->name('app.get.available.posts');
 
-// Banks:
+    // Banks:
     Route::get('/banks', [BankController::class, 'index'])->name('banks.list');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
 
     // User
-    Route::get('/user', function(Request $request){
+    Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
@@ -74,6 +78,3 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Allow transaction page without authentication:
 Route::post('/transaction/track', [TransactionController::class, 'track'])->name('api.track.transaction');
-
-
-

@@ -154,19 +154,19 @@ export default {
 }
 </script> -->
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
-import {useAPI} from "@/Composables/useAPI";
-import {useNotificationStore} from "@/stores/notification";
-import {router, usePage} from "@inertiajs/vue3";
-import {currencies} from "@/helpers/currencies";
-import {currencies_countries} from "@/helpers/currencies_countries";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useAPI } from "@/Composables/useAPI";
+import { useNotificationStore } from "@/stores/notification";
+import { router, usePage } from "@inertiajs/vue3";
+import { currencies } from "@/helpers/currencies";
+import { currencies_countries } from "@/helpers/currencies_countries";
 import Spinner from "@/Components/Custom/Spinner.vue";
 import NewActionButton from "@/Components/Design/NewActionButton.vue";
 import NewTextInput from "@/Components/Design/NewTextInput.vue";
 import NewSelectInput from "@/Components/Design/NewSelectInput.vue";
 import FiftyText from "@/Components/Design/FiftyText.vue";
 
-const emit = defineEmits(['stepChanged'])
+const emit = defineEmits(["stepChanged"]);
 const api = useAPI();
 const notification = useNotificationStore();
 const geoLocationDetails = usePage().props.geoDetails;
@@ -178,70 +178,87 @@ const props = defineProps({
     user: {
         required: true,
         default: null,
-        type: Object
+        type: Object,
     },
     receivingCountries: {
         required: true,
         default: [],
-        type: Array
-    }
-})
-
+        type: Array,
+    },
+});
 
 const transactionInfo = reactive({
-    'amount': '',
-    'currency': currencies_countries[geoLocationDetails.country_code],
-    'country': '',
+    amount: "",
+    currency: currencies_countries[geoLocationDetails.country_code],
+    country: "",
 });
 
 const saveTransactionInfo = async () => {
     api.startRequest();
 
     try {
-        const res = await axios.post('/api/collect-payment-info', transactionInfo);
-        if (res.data.status === 'success') {
-            goForward('/receiver-info?payment-reference-identification=' + res.data.paymentIntent.id + '&country=' + transactionInfo.country);
+        const res = await axios.post(
+            "/api/collect-payment-info",
+            transactionInfo
+        );
+        if (res.data.status === "success") {
+            goForward(
+                "/receiver-info?payment-reference-identification=" +
+                    res.data.paymentIntent.id +
+                    "&country=" +
+                    transactionInfo.country
+            );
         } else {
-            notification.notify('Unexpected error happen', 'error');
+            notification.notify("Unexpected error happen", "error");
         }
     } catch (errors) {
-        api.handleErrors(errors)
-        notification.notify('Invalid data submitted', 'error');
+        api.handleErrors(errors);
+        notification.notify("Invalid data submitted", "error");
     } finally {
         api.requestCompleted();
     }
-}
+};
 
 const convertCurrencyByCountryCode = async () => {
     isLoadingCurrencyRate.value = true;
 
     const selectedCountry = props.receivingCountries.find((country) => {
-        return country.code_iso_2 === transactionInfo.country || country.code === transactionInfo.country
+        return (
+            country.code_iso_2 === transactionInfo.country ||
+            country.code === transactionInfo.country
+        );
     });
 
     try {
-        const res = await axios.post('/api/convert-currency', {
-            'baseCurrency': transactionInfo.currency,
-            'requiredCurrency': selectedCountry.currency.code
+        const res = await axios.post("/api/convert-currency", {
+            baseCurrency: transactionInfo.currency,
+            requiredCurrency: selectedCountry.currency.code,
         });
 
-        currentRate.value = res?.data[selectedCountry.currency.code].value
-
+        currentRate.value = res?.data[selectedCountry.currency.code].value;
     } catch (errors) {
-        notification.notify('Exchange rate is not available at the moment..', 'error');
+        notification.notify(
+            "Exchange rate is not available at the moment..",
+            "error"
+        );
     } finally {
         isLoadingCurrencyRate.value = false;
     }
-}
+};
 
 const goForward = (url) => {
     router.get(url);
-}
+};
 
 const setTransactionValues = () => {
-    transactionInfo.amount = parseFloat((props.user.handled_transaction.payment_intent.amount_in_receiver_currency / 100).toFixed(2));
-    transactionInfo.country = props.user.handled_transaction.user.country
-}
+    transactionInfo.amount = parseFloat(
+        (
+            props.user.handled_transaction.payment_intent
+                .amount_in_receiver_currency / 100
+        ).toFixed(2)
+    );
+    transactionInfo.country = props.user.handled_transaction.user.country;
+};
 
 onMounted(() => {
     isTransactionPreset.value = !!props.user.transaction_id;
@@ -249,20 +266,18 @@ onMounted(() => {
     if (isTransactionPreset.value) {
         setTransactionValues();
     }
-
-})
+});
 
 // Cancelling:
 const cancel = () => {
-    router.visit('/');
-}
+    router.visit("/");
+};
 
 // receiver will get amount:
 
-const receiverGetsAmount = computed( () => {
-    return parseFloat((currentRate.value * transactionInfo.amount).toFixed(2))
+const receiverGetsAmount = computed(() => {
+    return parseFloat((currentRate.value * transactionInfo.amount).toFixed(2));
 });
-
 </script>
 
 <template>
@@ -310,14 +325,18 @@ const receiverGetsAmount = computed( () => {
         />
 
         <transition mode="out-in" name="fade">
-            <div v-if="currentRate && transactionInfo.amount" class="receiver-gets-wrapper m-auto">
+            <div
+                v-if="currentRate && transactionInfo.amount"
+                class="receiver-gets-wrapper m-auto"
+            >
                 <div class="receiver-gets">
                     <FiftyText class="title">
                         The receiver will get approximately
                     </FiftyText>
-                    <Spinner v-if="isLoadingCurrencyRate"/>
+                    <Spinner v-if="isLoadingCurrencyRate" />
                     <div class="amount" v-else>
-                        {{ receiverGetsAmount }} {{ currencies_countries[transactionInfo.country] }}
+                        {{ receiverGetsAmount }}
+                        {{ currencies_countries[transactionInfo.country] }}
                     </div>
                 </div>
             </div>
@@ -343,6 +362,6 @@ const receiverGetsAmount = computed( () => {
 
 <script>
 export default {
-    name: 'PaymentInformationForm'
-}
+    name: "PaymentInformationForm",
+};
 </script>

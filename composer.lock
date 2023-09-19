@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4566900cf51a7733bd6ceda69f6316c",
+    "content-hash": "234b55b7aa876296943752fd2dc7021b",
     "packages": [
         {
             "name": "brick/math",
@@ -126,6 +126,58 @@
                 }
             ],
             "time": "2022-02-21T13:15:14+00:00"
+        },
+        {
+            "name": "craigpaul/moneris-api",
+            "version": "v0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/craigpaul/moneris-api.git",
+                "reference": "335a1273aa34e75ae383ee6673690f1919201ca0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/craigpaul/moneris-api/zipball/335a1273aa34e75ae383ee6673690f1919201ca0",
+                "reference": "335a1273aa34e75ae383ee6673690f1919201ca0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/php-code-coverage": "^4.0",
+                "phpunit/phpunit": "~5.0",
+                "symfony/var-dumper": "^3.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CraigPaul\\Moneris\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Craig Paul",
+                    "email": "craig@townfolio.co"
+                }
+            ],
+            "description": "An easier way to consume the (truely awful) Moneris eSELECTplus API.",
+            "keywords": [
+                "api",
+                "eSELECTplus",
+                "moneris"
+            ],
+            "support": {
+                "issues": "https://github.com/craigpaul/moneris-api/issues",
+                "source": "https://github.com/craigpaul/moneris-api/tree/v0.2.1"
+            },
+            "abandoned": true,
+            "time": "2016-10-23T14:42:24+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
